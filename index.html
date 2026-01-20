@@ -1,549 +1,632 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flower Calculator – Artikel & Strauß Kalkulator</title>
 
-      --muted:#666;
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#111111;
+      --muted:#666666;
       --line:#e8e8e8;
 
       /* Buttons / Akzente */
-      --sage:#6f8f7a;       /* Salbei */
+      --sage:#6f8f7a;     /* Salbei */
       --sage-2:#5f7f6a;
-      --sand:#c7b29a;       /* Sand/Beige */
+      --sand:#c7b29a;     /* Sand/Beige */
       --sand-2:#b59f86;
 
-      --card:#fbfbfb;
-      --focus:#5a8cff;
+      --card:#fafafa;
+      --shadow: 0 8px 24px rgba(0,0,0,.06);
+      --radius: 14px;
     }
 
     *{box-sizing:border-box}
     body{
-      margin:16px;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color:var(--text);
+      background:var(--bg);
+      line-height:1.35;
     }
 
     .wrap{
-      max-width: 980px;
-      margin: 0 auto;
+      max-width: 1080px;
+      margin: 24px auto 60px;
+      padding: 0 16px;
     }
 
     header{
-      margin: 6px 0 14px;
-      text-align:center;
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+      justify-content:space-between;
+      margin-bottom: 16px;
+      flex-wrap:wrap;
     }
 
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 260px;
+    }
     h1{
+      font-size: 22px;
       margin:0;
-      font-size:1.45rem;
       letter-spacing:.2px;
     }
-
-    .sub{
-      margin:6px auto 0;
+    .subtitle{
       color:var(--muted);
-      font-size:.95rem;
-      max-width: 760px;
-      line-height:1.35;
+      font-size: 14px;
     }
 
     .toolbar{
       display:flex;
-      flex-wrap:wrap;
       gap:10px;
+      flex-wrap:wrap;
       align-items:center;
-      justify-content:center;
-      margin:14px 0 10px;
     }
 
     button{
-      border: 1px solid transparent;
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-weight: 700;
-      cursor: pointer;
-      min-height: 44px;
-      background:#f3f3f3;
-      color: var(--text);
+      border:0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 650;
+      cursor:pointer;
+      transition: transform .04s ease, filter .12s ease;
+      white-space:nowrap;
     }
     button:active{transform: translateY(1px)}
-    .btn-sage{
-      background: var(--sage);
-      color:#fff;
-      border-color: var(--sage);
-    }
-    .btn-sage:hover{background: var(--sage-2); border-color: var(--sage-2);}
-    .btn-sand{
-      background: var(--sand);
-      color:#1f1f1f;
-      border-color: var(--sand);
-    }
-    .btn-sand:hover{background: var(--sand-2); border-color: var(--sand-2);}
-
+    .btn-sage{background:var(--sage); color:white;}
+    .btn-sage:hover{filter:brightness(.95)}
+    .btn-sand{background:var(--sand); color:#222;}
+    .btn-sand:hover{filter:brightness(.97)}
     .btn-ghost{
-      background: #f7f7f7;
-      border-color: #e2e2e2;
-    }
-    .btn-ghost:hover{border-color:#cfcfcf}
-
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:center;
-      margin: 8px 0 14px;
-    }
-
-    select, input[type="text"]{
-      min-height:44px;
-      border-radius:12px;
-      border:1px solid #d7d7d7;
-      padding:10px 12px;
-      background:#fff;
+      background:transparent;
       color:var(--text);
-      font-weight:600;
+      border:1px solid var(--line);
     }
+    .btn-ghost:hover{filter:brightness(.98)}
 
     .card{
       background: var(--card);
-      border:1px solid var(--line);
-      border-radius: 16px;
-      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .table-wrap{
+      width:100%;
+      overflow:auto;
     }
 
     table{
       width:100%;
       border-collapse: collapse;
-      overflow:hidden;
-      border-radius: 14px;
+      min-width: 860px; /* damit es auf Laptop sauber aussieht, am Handy scrollt die Tabelle horizontal */
     }
 
     thead th{
+      text-align:left;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 650;
+      padding: 14px 12px;
+      border-bottom:1px solid var(--line);
+      background: #fff;
       position: sticky;
       top: 0;
       z-index: 1;
-      background:#f3f3f3;
-      text-align:left;
-      font-size:.9rem;
-      color:#333;
-      padding: 10px 8px;
-      border-bottom:1px solid var(--line);
     }
 
     tbody td{
-      padding: 10px 8px;
-      border-bottom:1px solid var(--line);
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
       vertical-align: middle;
+      background: #fff;
     }
 
-    .right{text-align:right}
-    .center{text-align:center}
+    tbody tr:hover td{
+      background: #fcfcfc;
+    }
 
-    .name{
+    input[type="text"], input[type="number"]{
       width: 100%;
-      min-width: 170px;
-      font-weight:700;
-    }
-
-    .price, .qty{
-      width: 120px;
-      text-align:right;
-      font-size: 16px;
-      border-radius: 12px;
-      border:1px solid #cfcfcf;
+      border: 1px solid var(--line);
+      border-radius: 10px;
       padding: 10px 10px;
-      min-height:44px;
+      font-size: 14px;
+      outline:none;
       background:#fff;
     }
-
-    .price:focus, .qty:focus, input[type="text"]:focus, select:focus{
-      outline:none;
-      border-color: var(--focus);
-      box-shadow: 0 0 0 3px rgba(90,140,255,.18);
+    input[type="number"]{
+      text-align:right;
+      font-variant-numeric: tabular-nums;
+    }
+    input:focus{
+      border-color: rgba(111,143,122,.65);
+      box-shadow: 0 0 0 3px rgba(111,143,122,.15);
     }
 
-    .sum{
-      font-weight:800;
+    .num{
+      text-align:right;
+      font-variant-numeric: tabular-nums;
       white-space:nowrap;
     }
 
-    .muted{color:var(--muted)}
-    .small{font-size:.9rem}
-
-    .actions{
+    .row-actions{
       display:flex;
       gap:8px;
       justify-content:flex-end;
-      flex-wrap:wrap;
     }
-
     .icon-btn{
-      border-radius: 12px;
-      min-height: 40px;
-      padding: 8px 10px;
-      border:1px solid #e1e1e1;
+      border-radius: 10px;
+      padding: 10px 10px;
+      border:1px solid var(--line);
       background:#fff;
       cursor:pointer;
-      font-weight:800;
     }
-    .icon-btn:hover{border-color:#cfcfcf}
+    .icon-btn:hover{filter:brightness(.98)}
+    .icon-btn.danger{
+      border-color: rgba(0,0,0,.08);
+    }
 
-    .totalbar{
-      margin-top: 12px;
-      position: sticky;
-      bottom: 10px;
-      background: #ffffff;
-      border:1px solid var(--line);
-      border-radius: 16px;
-      padding: 12px;
+    .footer{
       display:flex;
+      flex-wrap:wrap;
       gap:12px;
       align-items:center;
       justify-content:space-between;
-      box-shadow: 0 6px 18px rgba(0,0,0,.06);
+      padding: 16px;
+      background:#fff;
     }
 
-    .totalbar .label{
-      font-weight:900;
-      font-size:1.05rem;
+    .total{
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing:.2px;
     }
-    .totalbar .value{
-      font-weight:900;
-      font-size:1.35rem;
-      white-space:nowrap;
-    }
-
-    .hint{
-      margin-top: 10px;
+    .total small{
       color: var(--muted);
-      font-size:.9rem;
-      text-align:center;
+      font-weight: 650;
+      margin-right: 8px;
     }
 
-    @media (max-width: 720px){
-      body{margin:12px}
-      thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4){
-        text-align:right;
-      }
-      .price, .qty{width: 110px}
+    .small-note{
+      color: var(--muted);
+      font-size: 13px;
+      padding: 10px 2px 0;
+    }
+
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background:#fff;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .status{
+      color: var(--muted);
+      font-size: 13px;
+      padding: 0 2px;
+    }
+
+    @media (max-width: 640px){
+      h1{font-size: 20px}
+      .subtitle{font-size: 13px}
+      button{padding: 10px 12px}
+      .total{font-size: 17px}
     }
   </style>
 </head>
+
 <body>
-<div class="wrap">
-  <header>
-    <h1>Blumen-Kalkulator</h1>
-    <div class="sub">
-      Für Tagespreise & schnelle Strauß-/Werkstück-Summen – ohne Taschenrechner, ohne Werbung, alles lokal.
-    </div>
-  </header>
-
-  <div class="toolbar">
-    <button class="btn-sage" id="btnNewOrder">Neuer Auftrag (Mengen leeren)</button>
-    <button class="btn-ghost" id="btnAdd">+ Artikel hinzufügen</button>
-    <button class="btn-sand" id="btnSavePreset">Tagespreise speichern</button>
-
-    <div class="row" style="margin:0">
-      <label class="small muted" for="presetSelect">Preset:</label>
-      <select id="presetSelect" title="Gespeicherte Tagespreise laden"></select>
-      <button class="btn-ghost" id="btnLoadPreset">Laden</button>
-      <button class="btn-ghost" id="btnDeletePreset">Preset löschen</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <table aria-label="Blumen-Kalkulation">
-      <thead>
-        <tr>
-          <th>Artikel</th>
-          <th class="right">Preis (€)</th>
-          <th class="right">Menge</th>
-          <th class="right">Summe</th>
-          <th class="center"> </th>
-        </tr>
-      </thead>
-      <tbody id="rows"></tbody>
-    </table>
-
-    <div class="totalbar" role="status" aria-live="polite">
-      <div>
-        <div class="label">Gesamtsumme</div>
-        <div class="small muted">Auto-Speicherung aktiv (Entwurf bleibt erhalten)</div>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Flower Calculator</h1>
+        <div class="subtitle">
+          Artikel / Strauß / Werkstück kalkulieren – ohne Taschenrechner-Chaos. (Werbefrei, offline nutzbar)
+        </div>
       </div>
-      <div class="value" id="grandTotal">0,00&nbsp;€</div>
+
+      <div class="toolbar">
+        <span class="pill">🌿 Salbei & Sand</span>
+        <button class="btn-sage" id="addRowBtn">+ Position hinzufügen</button>
+        <button class="btn-sand" id="saveBtn">Speichern</button>
+        <button class="btn-ghost" id="loadBtn">Laden</button>
+        <button class="btn-ghost" id="csvBtn">CSV Export</button>
+        <button class="btn-ghost" id="demoBtn">Beispielwerte</button>
+        <button class="btn-ghost" id="clearBtn">Alles löschen</button>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table aria-label="Kalkulationstabelle">
+          <thead>
+            <tr>
+              <th style="width:40%">Artikel / Blume</th>
+              <th style="width:14%" class="num">Einzelpreis (€)</th>
+              <th style="width:14%" class="num">Menge</th>
+              <th style="width:16%" class="num">Summe (€)</th>
+              <th style="width:16%" class="num">Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+
+      <div class="footer">
+        <div class="total">
+          <small>Gesamtsumme:</small>
+          <span id="grandTotal">0,00 €</span>
+        </div>
+
+        <div class="status" id="statusText">Bereit.</div>
+      </div>
     </div>
 
-    <div class="hint">
-      Tipp: Preise als „Tagespreise“ speichern → dann nur Mengen tippen → fertig.
+    <div class="small-note">
+      Tipp: Du kannst die Tabelle einfach nach unten „wachsen“ lassen – es gibt keine Begrenzung.
+      Speichern/Laden funktioniert im gleichen Browser (z. B. im Laden-PC).
     </div>
   </div>
-</div>
 
-<script>
-  const KEY_DRAFT  = "florcalc_draft_v1";
-  const KEY_PRESET = "florcalc_presets_v1";
+  <script>
+    // -------- Helpers --------
+    const fmtEUR = (value) => {
+      const n = Number(value);
+      const safe = isFinite(n) ? n : 0;
+      return safe.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+    };
 
-  const fmtEUR = (num) =>
-    num.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+    const parseNum = (val) => {
+      if (val === null || val === undefined) return 0;
+      // erlaubt Eingaben wie "1,50"
+      const s = String(val).trim().replace(/\./g, '').replace(',', '.');
+      const n = Number(s);
+      return isFinite(n) ? n : 0;
+    };
 
-  const defaultItems = [
-    { name: "Rose",        price: "" },
-    { name: "Tulpe",       price: "" },
-    { name: "Ranunkel",    price: "" },
-    { name: "Eukalyptus",  price: "" },
-    { name: "Schleierkraut", price: "" },
-    { name: "Hortensie",   price: "" },
-    { name: "Limonium",    price: "" },
-    { name: "Chrysantheme", price: "" },
-    { name: "Distel",      price: "" },
-    { name: "Grünmix",     price: "" }
-  ];
+    const setStatus = (msg) => {
+      const el = document.getElementById('statusText');
+      el.textContent = msg;
+      clearTimeout(setStatus._t);
+      setStatus._t = setTimeout(() => el.textContent = 'Bereit.', 1800);
+    };
 
-  const state = {
-    rows: [] // {id, name, price, qty}
-  };
+    // -------- State --------
+    const rowsEl = document.getElementById('rows');
+    const grandTotalEl = document.getElementById('grandTotal');
 
-  const rowsEl = document.getElementById("rows");
-  const grandEl = document.getElementById("grandTotal");
-  const presetSelect = document.getElementById("presetSelect");
+    const state = {
+      rows: [] // {id, name, price, qty}
+    };
 
-  function uid(){
-    return (crypto.randomUUID ? crypto.randomUUID() : (Date.now()+"_"+Math.random().toString(16).slice(2)));
-  }
+    const newId = () => Math.random().toString(36).slice(2, 10);
 
-  function parseNumber(value){
-    // erlaubt 12,5 oder 12.5
-    const v = String(value || "").trim().replace(",", ".");
-    if (v === "") return 0;
-    const n = Number(v);
-    return Number.isFinite(n) ? n : 0;
-  }
+    // -------- Rendering --------
+    function calcRowSum(r){
+      const price = parseNum(r.price);
+      const qty = parseNum(r.qty);
+      return price * qty;
+    }
 
-  function readPresets(){
-    try { return JSON.parse(localStorage.getItem(KEY_PRESET) || "{}"); }
-    catch { return {}; }
-  }
+    function calcGrandTotal(){
+      return state.rows.reduce((acc, r) => acc + calcRowSum(r), 0);
+    }
 
-  function writePresets(obj){
-    localStorage.setItem(KEY_PRESET, JSON.stringify(obj));
-  }
+    function render(){
+      rowsEl.innerHTML = '';
 
-  function saveDraft(){
-    localStorage.setItem(KEY_DRAFT, JSON.stringify({ savedAt: Date.now(), rows: state.rows }));
-  }
+      state.rows.forEach((r, idx) => {
+        const tr = document.createElement('tr');
 
-  function loadDraft(){
-    try{
-      const d = JSON.parse(localStorage.getItem(KEY_DRAFT) || "null");
-      if (d && Array.isArray(d.rows) && d.rows.length){
-        state.rows = d.rows;
-        return true;
+        // Name
+        const tdName = document.createElement('td');
+        const inpName = document.createElement('input');
+        inpName.type = 'text';
+        inpName.placeholder = 'z. B. Rose, Tulpe, Eukalyptus, Band, Vase …';
+        inpName.value = r.name ?? '';
+        inpName.addEventListener('input', (e) => {
+          r.name = e.target.value;
+        });
+        tdName.appendChild(inpName);
+
+        // Price
+        const tdPrice = document.createElement('td');
+        const inpPrice = document.createElement('input');
+        inpPrice.type = 'number';
+        inpPrice.step = '0.01';
+        inpPrice.min = '0';
+        inpPrice.placeholder = '0,00';
+        inpPrice.value = (r.price ?? '');
+        inpPrice.addEventListener('input', (e) => {
+          r.price = e.target.value;
+          updateTotals();
+        });
+        tdPrice.appendChild(inpPrice);
+
+        // Qty
+        const tdQty = document.createElement('td');
+        const inpQty = document.createElement('input');
+        inpQty.type = 'number';
+        inpQty.step = '1';
+        inpQty.min = '0';
+        inpQty.placeholder = '0';
+        inpQty.value = (r.qty ?? '');
+        inpQty.addEventListener('input', (e) => {
+          r.qty = e.target.value;
+          updateTotals();
+        });
+        tdQty.appendChild(inpQty);
+
+        // Sum
+        const tdSum = document.createElement('td');
+        tdSum.className = 'num';
+        tdSum.textContent = fmtEUR(calcRowSum(r));
+
+        // Actions
+        const tdAct = document.createElement('td');
+        tdAct.className = 'num';
+        const wrap = document.createElement('div');
+        wrap.className = 'row-actions';
+
+        const btnDup = document.createElement('button');
+        btnDup.className = 'icon-btn';
+        btnDup.type = 'button';
+        btnDup.title = 'Zeile duplizieren';
+        btnDup.textContent = '⎘';
+        btnDup.addEventListener('click', () => {
+          const copy = { id: newId(), name: r.name, price: r.price, qty: r.qty };
+          state.rows.splice(idx + 1, 0, copy);
+          render();
+          updateTotals();
+          setStatus('Zeile dupliziert.');
+        });
+
+        const btnDel = document.createElement('button');
+        btnDel.className = 'icon-btn danger';
+        btnDel.type = 'button';
+        btnDel.title = 'Zeile löschen';
+        btnDel.textContent = '🗑';
+        btnDel.addEventListener('click', () => {
+          state.rows = state.rows.filter(x => x.id !== r.id);
+          if (state.rows.length === 0) addRow(); // nie komplett leer
+          render();
+          updateTotals();
+          setStatus('Zeile gelöscht.');
+        });
+
+        wrap.appendChild(btnDup);
+        wrap.appendChild(btnDel);
+        tdAct.appendChild(wrap);
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdPrice);
+        tr.appendChild(tdQty);
+        tr.appendChild(tdSum);
+        tr.appendChild(tdAct);
+
+        rowsEl.appendChild(tr);
+      });
+
+      updateTotals();
+    }
+
+    function updateTotals(){
+      // Update row sums
+      const trs = rowsEl.querySelectorAll('tr');
+      trs.forEach((tr, i) => {
+        const r = state.rows[i];
+        const tdSum = tr.children[3];
+        tdSum.textContent = fmtEUR(calcRowSum(r));
+      });
+
+      // Update grand total
+      grandTotalEl.textContent = fmtEUR(calcGrandTotal());
+    }
+
+    // -------- Actions --------
+    function addRow(prefill = {}){
+      state.rows.push({
+        id: newId(),
+        name: prefill.name ?? '',
+        price: prefill.price ?? '',
+        qty: prefill.qty ?? ''
+      });
+    }
+
+    function clearAll(){
+      state.rows = [];
+      addRow();
+      addRow();
+      addRow();
+      render();
+      setStatus('Alles gelöscht.');
+    }
+
+    function setDemo(){
+      state.rows = [];
+      [
+        { name:'Rose', price:'2.50', qty:'7' },
+        { name:'Tulpe', price:'1.40', qty:'10' },
+        { name:'Eukalyptus', price:'3.20', qty:'2' },
+        { name:'Band', price:'0.80', qty:'1' }
+      ].forEach(addRow);
+      addRow(); addRow(); // Platz
+      render();
+      setStatus('Beispielwerte geladen.');
+    }
+
+    // Save/Load in browser (LocalStorage)
+    const STORAGE_KEY = 'flower_calculator_rows_v1';
+
+    function save(){
+      const payload = {
+        savedAt: new Date().toISOString(),
+        rows: state.rows.map(r => ({ name:r.name ?? '', price:r.price ?? '', qty:r.qty ?? '' }))
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      setStatus('Gespeichert (im Browser).');
+    }
+
+    function load(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw){
+        setStatus('Kein gespeicherter Stand gefunden.');
+        return;
       }
-    } catch {}
-    return false;
-  }
-
-  function buildDefault(){
-    state.rows = defaultItems.map(it => ({ id: uid(), name: it.name, price: it.price, qty: "" }));
-  }
-
-  function compute(){
-    let total = 0;
-    for (const r of state.rows){
-      const price = parseNumber(r.price);
-      const qty   = parseNumber(r.qty);
-      total += price * qty;
-    }
-    grandEl.innerHTML = fmtEUR(total).replace(" €", "&nbsp;€");
-    saveDraft();
-  }
-
-  function render(){
-    rowsEl.innerHTML = "";
-    for (const r of state.rows){
-      const tr = document.createElement("tr");
-
-      // Name
-      const tdName = document.createElement("td");
-      const nameInput = document.createElement("input");
-      nameInput.type = "text";
-      nameInput.className = "name";
-      nameInput.value = r.name || "";
-      nameInput.placeholder = "Artikel (z. B. Rose)";
-      nameInput.addEventListener("input", () => {
-        r.name = nameInput.value;
-        compute();
-      });
-      tdName.appendChild(nameInput);
-
-      // Price
-      const tdPrice = document.createElement("td");
-      tdPrice.className = "right";
-      const priceInput = document.createElement("input");
-      priceInput.type = "text";
-      priceInput.inputMode = "decimal";
-      priceInput.className = "price";
-      priceInput.placeholder = "0,00";
-      priceInput.value = r.price ?? "";
-      priceInput.addEventListener("input", () => {
-        r.price = priceInput.value;
-        updateRowSum(tr, r);
-        compute();
-      });
-      tdPrice.appendChild(priceInput);
-
-      // Qty
-      const tdQty = document.createElement("td");
-      tdQty.className = "right";
-      const qtyInput = document.createElement("input");
-      qtyInput.type = "text";
-      qtyInput.inputMode = "numeric";
-      qtyInput.className = "qty";
-      qtyInput.placeholder = "0";
-      qtyInput.value = r.qty ?? "";
-      qtyInput.addEventListener("input", () => {
-        r.qty = qtyInput.value;
-        updateRowSum(tr, r);
-        compute();
-      });
-      tdQty.appendChild(qtyInput);
-
-      // Sum
-      const tdSum = document.createElement("td");
-      tdSum.className = "right sum";
-      tdSum.dataset.role = "sum";
-      tdSum.textContent = "—";
-
-      // Actions
-      const tdAct = document.createElement("td");
-      tdAct.className = "center";
-      const delBtn = document.createElement("button");
-      delBtn.className = "icon-btn";
-      delBtn.title = "Zeile löschen";
-      delBtn.textContent = "✕";
-      delBtn.addEventListener("click", () => {
-        state.rows = state.rows.filter(x => x.id !== r.id);
+      try{
+        const data = JSON.parse(raw);
+        state.rows = [];
+        (data.rows || []).forEach(addRow);
+        if(state.rows.length === 0){ addRow(); addRow(); addRow(); }
         render();
-        compute();
+        setStatus('Geladen.');
+      }catch(e){
+        setStatus('Laden fehlgeschlagen.');
+      }
+    }
+
+    // CSV Export
+    function exportCSV(){
+      const header = ['Artikel','Einzelpreis','Menge','Summe'];
+      const lines = [header.join(';')];
+
+      state.rows.forEach(r => {
+        const sum = calcRowSum(r);
+        const row = [
+          (r.name ?? '').replace(/;/g, ','),
+          parseNum(r.price).toFixed(2).replace('.', ','),
+          String(parseNum(r.qty)).replace('.', ','),
+          sum.toFixed(2).replace('.', ',')
+        ];
+        lines.push(row.join(';'));
       });
-      tdAct.appendChild(delBtn);
 
-      tr.appendChild(tdName);
-      tr.appendChild(tdPrice);
-      tr.appendChild(tdQty);
-      tr.appendChild(tdSum);
-      tr.appendChild(tdAct);
+      lines.push(['','','Gesamt', parseNum(calcGrandTotal()).toFixed(2).replace('.', ',')].join(';'));
 
-      rowsEl.appendChild(tr);
-      updateRowSum(tr, r);
+      const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'flower-calculator.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setStatus('CSV exportiert.');
     }
-    compute();
-  }
 
-  function updateRowSum(tr, r){
-    const td = tr.querySelector('[data-role="sum"]');
-    const price = parseNumber(r.price);
-    const qty   = parseNumber(r.qty);
-    const s = price * qty;
-    td.textContent = s > 0 ? fmtEUR(s) : "—";
-  }
+    // -------- Wire up buttons --------
+    document.getElementById('addRowBtn').addEventListener('click', () => {
+      addRow();
+      render();
+      setStatus('Position hinzugefügt.');
+      // optional: nach unten scrollen
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
 
-  function clearQuantities(){
-    for (const r of state.rows){
-      r.qty = "";
-    }
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      if(confirm('Wirklich alles löschen?')){
+        clearAll();
+      }
+    });
+
+    document.getElementById('demoBtn').addEventListener('click', () => setDemo());
+    document.getElementById('saveBtn').addEventListener('click', () => save());
+    document.getElementById('loadBtn').addEventListener('click', () => load());
+    document.getElementById('csvBtn').addEventListener('click', () => exportCSV());
+
+    // -------- Init --------
+    // Start mit mehr als 10 Zeilen? Kein Problem: wir starten direkt mit 15 leeren Positionen.
+    for(let i=0; i<15; i++) addRow();
     render();
-  }
-
-  function addRow(){
-    state.rows.push({ id: uid(), name: "", price: "", qty: "" });
-    render();
-  }
-
-  function refreshPresetSelect(){
-    const presets = readPresets();
-    const names = Object.keys(presets).sort((a,b) => a.localeCompare(b, "de-DE"));
-    presetSelect.innerHTML = "";
-    const opt0 = document.createElement("option");
-    opt0.value = "";
-    opt0.textContent = "— auswählen —";
-    presetSelect.appendChild(opt0);
-    for (const n of names){
-      const opt = document.createElement("option");
-      opt.value = n;
-      opt.textContent = n;
-      presetSelect.appendChild(opt);
-    }
-  }
-
-  function savePreset(){
-    const name = prompt("Name für Tagespreise (z. B. Montag / Winterpreise / Tatjana):");
-    if (!name) return;
-
-    // Wir speichern NUR Name + Preis (Mengen bleiben leer)
-    const data = state.rows.map(r => ({
-      name: (r.name || "").trim(),
-      price: (r.price || "").trim()
-    })).filter(x => x.name !== "" || x.price !== "");
-
-    const presets = readPresets();
-    presets[name.trim()] = { savedAt: Date.now(), rows: data };
-    writePresets(presets);
-    refreshPresetSelect();
-    presetSelect.value = name.trim();
-    alert("Tagespreise gespeichert.");
-  }
-
-  function loadPreset(){
-    const key = presetSelect.value;
-    if (!key) { alert("Bitte erst ein Preset auswählen."); return; }
-
-    const presets = readPresets();
-    const p = presets[key];
-    if (!p || !Array.isArray(p.rows)) { alert("Preset nicht gefunden."); return; }
-
-    // Beim Laden: Preise/Artikel aus Preset, Mengen leer
-    state.rows = p.rows.map(x => ({
-      id: uid(),
-      name: x.name ?? "",
-      price: x.price ?? "",
-      qty: ""
-    }));
-
-    // Fallback: falls sehr wenig drin ist, hängen wir 1 leere Zeile an
-    if (state.rows.length === 0) state.rows.push({ id: uid(), name: "", price: "", qty: "" });
-
-    render();
-  }
-
-  function deletePreset(){
-    const key = presetSelect.value;
-    if (!key) { alert("Bitte erst ein Preset auswählen."); return; }
-    if (!confirm(`Preset „${key}“ wirklich löschen?`)) return;
-
-    const presets = readPresets();
-    delete presets[key];
-    writePresets(presets);
-    refreshPresetSelect();
-    presetSelect.value = "";
-    alert("Preset gelöscht.");
-  }
-
-  // Buttons
-  document.getElementById("btnNewOrder").addEventListener("click", () => {
-    if (!confirm("Neuen Auftrag starten? (Nur Mengen werden geleert – Preise bleiben.)")) return;
-    clearQuantities();
-  });
-
-  document.getElementById("btnAdd").addEventListener("click", addRow);
-  document.getElementById("btnSavePreset").addEventListener("click", savePreset);
-  document.getElementById("btnLoadPreset").addEventListener("click", loadPreset);
-  document.getElementById("btnDeletePreset").addEventListener("click", deletePreset);
-
-  // Start
-  refreshPresetSelect();
-  if (!loadDraft()){
-    buildDefault();
-  }
-  render();
-</script>
+  </script>
 </body>
 </html>
+
+     
+  
+ 
+   
+ 
+
+ 
+  
+  
+  
+  
+
+  
+   
+   
+    
+   
+ 
+     
+    
+ 
+  
+
+
+  
+    
+   
+
+
+  
+
+ 
+  
+
+ 
+  
+ 
+
+   
+ 
+   
+    
+      
+   
+  
+    
+     
+
+    
+     
+     
+  
+
+
+
+ 
+
+ 
+  
+  
+
+ 
+    
+ 
+
+
+   
+ 
+
+  
+ 
+  
