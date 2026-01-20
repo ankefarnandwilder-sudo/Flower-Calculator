@@ -3,404 +3,430 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Artikel-Kalkulator – offline</title>
+  <title>Preisrechner (offline)</title>
   <style>
     :root{
-      --bg:#fff;
-      --text:#2b2b2b;
-      --muted:#6b6b6b;
-      --line:#e7e7e7;
-      --card:#fbfbfb;
+      --bg:#ffffff;
+      --card:#ffffff;
+      --line:#e8e8e8;
+      --text:#1f1f1f;
+      --muted:#6f6f6f;
 
-      --sage:#5f7f73;   /* Salbei */
-      --sand:#b08a62;   /* Sand */
-      --btnText:#fff;
+      /* Deine zwei Akzentfarben (kein Rot) */
+      --green:#2f6b57;   /* Grün */
+      --brown:#7a5a3a;   /* Braun */
 
-      --radius:14px;
-      --shadow:0 8px 20px rgba(0,0,0,.06);
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
+      --radius: 16px;
+      --radius2: 12px;
     }
-    *{box-sizing:border-box}
+
+    *{ box-sizing:border-box; }
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:var(--bg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text);
+      background: #f7f7f7;
+      padding: 18px;
     }
+
     .wrap{
-      max-width:980px;
-      margin:18px auto 28px;
-      padding:0 14px;
+      max-width: 1050px;
+      margin: 0 auto;
     }
-    h1{
-      margin:0 0 8px;
-      text-align:center;
-      font-size:1.35rem;
-      letter-spacing:.2px;
-    }
-    .sub{
-      margin:0 auto 12px;
-      max-width:780px;
-      color:var(--muted);
-      font-size:.95rem;
-      line-height:1.35;
-    }
-    .panel{
+
+    .card{
       background:var(--card);
       border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:12px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
     }
+
+    h1{
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      letter-spacing: .2px;
+    }
+    .sub{
+      margin:0 0 14px 0;
+      color:var(--muted);
+      font-size: 13px;
+    }
+
     .bar{
       display:flex;
       flex-wrap:wrap;
       gap:10px;
-      justify-content:center;
       align-items:center;
-      margin:6px 0 10px;
+      margin: 10px 0 14px 0;
     }
-    button{
-      border:none;
-      border-radius:12px;
-      padding:10px 14px;
-      font-weight:800;
-      cursor:pointer;
-      min-height:44px;
-      color:var(--btnText);
-      letter-spacing:.2px;
-      transition:opacity .15s ease, transform .04s ease;
-    }
-    button:active{ transform:translateY(1px); }
-    button:hover{ opacity:.92; }
 
-    .btn-sage{ background:var(--sage); }
-    .btn-sand{ background:var(--sand); }
+    .btn{
+      border:0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    .btn-green{ background: var(--green); color:#fff; }
+    .btn-brown{ background: var(--brown); color:#fff; }
     .btn-ghost{
-      background:transparent;
-      color:var(--text);
+      background:#efefef;
+      color:#222;
+      font-weight: 700;
+    }
+
+    /* Scrollbereich, damit es auf Handy nicht endlos wird */
+    .table-wrap{
       border:1px solid var(--line);
-      font-weight:800;
+      border-radius: var(--radius2);
+      overflow:hidden;
+    }
+    .table-scroll{
+      max-height: 420px; /* auf Desktop angenehm */
+      overflow:auto;
+      background:#fff;
+    }
+    @media (max-width: 700px){
+      .table-scroll{ max-height: 58vh; } /* auf Handy gut */
+      h1{ font-size: 22px; }
     }
 
     table{
       width:100%;
-      border-collapse:collapse;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:12px;
-      overflow:hidden;
+      border-collapse: collapse;
+      min-width: 720px; /* damit Spalten nicht zu eng werden */
     }
     thead th{
-      background:#f3f3f3;
-      font-size:.92rem;
+      position: sticky;
+      top: 0;
+      background: #f4f4f4;
+      z-index: 2;
       text-align:left;
-      padding:10px 10px;
-      border-bottom:1px solid var(--line);
-      position:sticky;
-      top:0;
-      z-index:1;
+      font-size: 13px;
+      color:#333;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
     }
     tbody td{
-      padding:8px 10px;
-      border-bottom:1px solid var(--line);
-      vertical-align:middle;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
     }
-    tbody tr:last-child td{ border-bottom:none; }
+    tbody tr:last-child td{ border-bottom:0; }
 
-    .col-article{ width:48%; }
-    .col-price{ width:18%; }
-    .col-qty{ width:16%; }
-    .col-sum{ width:18%; }
-    .col-actions{ width:0%; }
-
-    input[type="text"], input[type="number"]{
+    .inp{
       width:100%;
-      min-height:42px;
-      padding:8px 10px;
-      border:1px solid #d7d7d7;
-      border-radius:12px;
-      font-size:16px;
+      padding: 10px 10px;
+      border:1px solid #dcdcdc;
+      border-radius: 10px;
+      font-size: 14px;
       outline:none;
-    }
-    input[type="number"]{ text-align:right; }
-    input:focus{
-      border-color:#8aa9ff;
-      box-shadow:0 0 0 3px rgba(138,169,255,.22);
-    }
-
-    .sumCell{
-      text-align:right;
-      font-weight:900;
-      white-space:nowrap;
-    }
-    .mutedCell{
-      color:var(--muted);
-      font-weight:700;
-    }
-
-    .rowActions{
-      display:flex;
-      gap:8px;
-      justify-content:flex-end;
-    }
-    .mini{
-      min-height:40px;
-      padding:8px 10px;
-      border-radius:12px;
-      font-weight:900;
-    }
-
-    .total{
-      margin-top:12px;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
       background:#fff;
+    }
+    .inp:focus{
+      border-color:#bdbdbd;
+      box-shadow: 0 0 0 3px rgba(0,0,0,.05);
+    }
+
+    .qty{
+      width: 110px;
+    }
+    .price{
+      width: 140px;
+    }
+
+    .sumBox{
+      width: 160px;
+      padding: 10px 10px;
+      border:1px solid #dcdcdc;
+      border-radius: 10px;
+      background:#fafafa;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    .footer{
       display:flex;
+      flex-wrap:wrap;
+      gap:12px;
       justify-content:space-between;
       align-items:center;
-      gap:10px;
+      margin-top: 12px;
     }
-    .total .label{ font-weight:900; font-size:1.05rem; }
-    .total .value{ font-weight:950; font-size:1.25rem; white-space:nowrap; }
+    .total{
+      font-weight: 900;
+      font-size: 16px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .total .val{
+      font-variant-numeric: tabular-nums;
+      background:#f4f4f4;
+      border:1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 10px;
+      min-width: 140px;
+      text-align:right;
+    }
 
-    .foot{
-      margin-top:10px;
+    .hint{
       color:var(--muted);
-      font-size:.9rem;
-      text-align:center;
-      line-height:1.35;
+      font-size: 12px;
+    }
+
+    /* Kleine Icon-Optik */
+    .ico{
+      font-size: 16px;
+      line-height: 1;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Artikel-Kalkulator (offline)</h1>
-    <p class="sub">
-      Für schnelle Preisberechnung ohne Kopfrechnen. Artikel, Einzelpreis und Menge eingeben –
-      Summen berechnen sich automatisch. Alles bleibt lokal auf diesem Gerät.
-    </p>
+    <div class="card">
+      <h1>Preisrechner <span style="font-weight:700; color:var(--muted);">(offline)</span></h1>
+      <p class="sub">Alles bleibt lokal auf diesem Gerät. Speichern/Laden funktioniert über den Browser.</p>
 
-    <div class="panel">
       <div class="bar">
-        <button class="btn-sage" id="btnAddRow">+ Artikel hinzufügen</button>
-        <button class="btn-sand" id="btnSave">Speichern</button>
-        <button class="btn-ghost" id="btnResetQty">Nur Mengen zurücksetzen</button>
+        <button class="btn btn-green" id="addRowBtn"><span class="ico">＋</span>Artikel hinzufügen</button>
+        <button class="btn btn-brown" id="saveBtn"><span class="ico">💾</span>Speichern</button>
+        <button class="btn btn-ghost" id="loadBtn"><span class="ico">↩</span>Laden</button>
+        <button class="btn btn-ghost" id="resetQtyBtn"><span class="ico">⟲</span>Mengen zurücksetzen</button>
       </div>
 
-      <table aria-label="Artikel Kalkulation">
-        <thead>
-          <tr>
-            <th class="col-article">Artikel</th>
-            <th class="col-price">Einzelpreis (€)</th>
-            <th class="col-qty">Menge</th>
-            <th class="col-sum">Summe</th>
-            <th class="col-actions"></th>
-          </tr>
-        </thead>
-        <tbody id="rows"></tbody>
-      </table>
-
-      <div class="total">
-        <div class="label">Gesamtsumme</div>
-        <div class="value" id="grandTotal">0,00&nbsp;€</div>
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table aria-label="Preisrechner Tabelle">
+            <thead>
+              <tr>
+                <th style="width: 45%;">Artikel / Produkt / Leistung</th>
+                <th style="width: 18%;">Einzelpreis (€)</th>
+                <th style="width: 17%;">Menge</th>
+                <th style="width: 20%; text-align:right;">Summe (€)</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="foot">
-        Offline, werbefrei, ohne Registrierung. Speicherung lokal (Browser).
+      <div class="footer">
+        <div class="total">
+          <span>Gesamtsumme</span>
+          <span class="val" id="grandTotal">0,00 €</span>
+        </div>
+        <div class="hint">Tipp: Einzelpreis kann mit Komma eingegeben werden (z. B. 4,50).</div>
       </div>
     </div>
   </div>
 
   <script>
-    const KEY = "item_calc_simple_v1";
-    const DEFAULT_ROWS = 25;
+    // ====== Einstellungen ======
+    const START_ROWS = 6;              // nicht zu viele offene Zeilen (Handy!)
+    const STORAGE_KEY = "preisrechner_v1";
 
-    function formatEUR(n){
-      return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "\u00A0€";
-    }
+    // ====== Helfer: Zahl robust aus deutschem Input ======
+    function parseEuroInput(value){
+      // Erlaubt: "4,50" "4.50" "4" " 4,5 "
+      if (value === null || value === undefined) return 0;
+      let s = String(value).trim();
+      if (!s) return 0;
 
-    // Nimmt "4,50" oder "4.50" oder "1.234,56"
-    function parsePrice(str){
-      if (!str) return 0;
-      let s = String(str).trim().replace(/\s+/g, "");
-      if (s === "") return 0;
+      // Entferne Leerzeichen
+      s = s.replace(/\s+/g, "");
 
-      const hasComma = s.includes(",");
-      if (hasComma){
-        s = s.replace(/\./g, "");   // Tausenderpunkte raus
-        s = s.replace(",", ".");    // Dezimalkomma -> Punkt
-      }
-      s = s.replace(/[^0-9.]/g, "");
+      // Wenn jemand Tausenderpunkte nutzt (1.234,56), machen wir es robust:
+      // - Entferne alle Punkte, die als Tausendertrenner wirken könnten,
+      // - Dann Komma zu Punkt.
+      // Heuristik: Wenn Komma existiert, entferne Punkte komplett.
+      if (s.includes(",")) s = s.replace(/\./g, "");
+
+      s = s.replace(",", ".");
       const n = Number(s);
       return Number.isFinite(n) ? n : 0;
     }
 
-    function parseQty(str){
-      const s = String(str ?? "").trim();
-      if (s === "") return 0;
-      const n = parseInt(s, 10);
-      return Number.isFinite(n) && n > 0 ? n : 0;
+    function formatEuro(n){
+      const x = Number.isFinite(n) ? n : 0;
+      return x.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
     }
 
-    function uid(){
-      return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
+    // ====== Datenmodell ======
+    function newRow(){
+      return { name:"", price:"", qty:0 };
     }
 
-    let state = { rows: [] };
+    let rows = [];
 
-    function makeRow(){
-      return { id: uid(), article: "", priceStr: "", qtyStr: "" };
-    }
-
-    const tbody = document.getElementById("rows");
-    const totalEl = document.getElementById("grandTotal");
-
-    function autosave(){
-      localStorage.setItem(KEY, JSON.stringify({ rows: state.rows, savedAt: Date.now() }));
-    }
-
-    function load(){
-      try{
-        const raw = localStorage.getItem(KEY);
-        if (!raw) return false;
-        const obj = JSON.parse(raw);
-        if (!obj || !Array.isArray(obj.rows)) return false;
-        state.rows = obj.rows;
-        return state.rows.length > 0;
-      } catch { return false; }
-    }
-
-    function updateTotals(){
-      let grand = 0;
-      for (const r of state.rows){
-        const price = parsePrice(r.priceStr);
-        const qty = parseQty(r.qtyStr);
-        const sum = price * qty;
-
-        const cell = document.getElementById("sum_" + r.id);
-        if (cell){
-          if (sum === 0){
-            cell.textContent = "—";
-            cell.classList.add("mutedCell");
-          } else {
-            cell.textContent = formatEUR(sum);
-            cell.classList.remove("mutedCell");
-          }
-        }
-        grand += sum;
-      }
-      totalEl.innerHTML = formatEUR(grand).replace(" €", "&nbsp;€");
-    }
+    // ====== DOM ======
+    const tbody = document.getElementById("tbody");
+    const grandTotalEl = document.getElementById("grandTotal");
 
     function render(){
       tbody.innerHTML = "";
 
-      state.rows.forEach((r, idx) => {
+      rows.forEach((r, idx) => {
         const tr = document.createElement("tr");
 
-        const tdA = document.createElement("td");
-        const inA = document.createElement("input");
-        inA.type = "text";
-        inA.placeholder = "z. B. Artikel / Produkt / Leistung …";
-        inA.value = r.article;
-        inA.addEventListener("input", () => { r.article = inA.value; autosave(); });
-        tdA.appendChild(inA);
-
-        const tdP = document.createElement("td");
-        const inP = document.createElement("input");
-        inP.type = "text";
-        inP.inputMode = "decimal";
-        inP.placeholder = "z. B. 4,50";
-        inP.value = r.priceStr;
-        inP.addEventListener("input", () => { r.priceStr = inP.value; updateTotals(); autosave(); });
-        tdP.appendChild(inP);
-
-        const tdQ = document.createElement("td");
-        const inQ = document.createElement("input");
-        inQ.type = "number";
-        inQ.min = "0";
-        inQ.step = "1";
-        inQ.placeholder = "0";
-        inQ.value = r.qtyStr;
-        inQ.addEventListener("input", () => { r.qtyStr = inQ.value; updateTotals(); autosave(); });
-        tdQ.appendChild(inQ);
-
-        const tdS = document.createElement("td");
-        tdS.className = "sumCell mutedCell";
-        tdS.id = "sum_" + r.id;
-        tdS.textContent = "—";
-
-        const tdX = document.createElement("td");
-        tdX.className = "col-actions";
-        const actions = document.createElement("div");
-        actions.className = "rowActions";
-
-        const btnDup = document.createElement("button");
-        btnDup.className = "mini btn-ghost";
-        btnDup.type = "button";
-        btnDup.title = "Zeile duplizieren";
-        btnDup.textContent = "⎘";
-        btnDup.addEventListener("click", () => {
-          const copy = { id: uid(), article: r.article, priceStr: r.priceStr, qtyStr: r.qtyStr };
-          state.rows.splice(idx + 1, 0, copy);
-          render(); updateTotals(); autosave();
+        // Artikel
+        const tdName = document.createElement("td");
+        const inpName = document.createElement("input");
+        inpName.className = "inp";
+        inpName.value = r.name;
+        inpName.placeholder = "";
+        inpName.addEventListener("input", () => {
+          rows[idx].name = inpName.value;
+          // kein render nötig
         });
+        tdName.appendChild(inpName);
 
-        const btnDel = document.createElement("button");
-        btnDel.className = "mini btn-ghost";
-        btnDel.type = "button";
-        btnDel.title = "Zeile löschen";
-        btnDel.textContent = "✕";
-        btnDel.addEventListener("click", () => {
-          state.rows = state.rows.filter(x => x.id !== r.id);
-          if (state.rows.length === 0) state.rows.push(makeRow());
-          render(); updateTotals(); autosave();
+        // Preis
+        const tdPrice = document.createElement("td");
+        const inpPrice = document.createElement("input");
+        inpPrice.className = "inp price";
+        inpPrice.inputMode = "decimal";
+        inpPrice.value = r.price;
+        inpPrice.placeholder = "";
+        inpPrice.addEventListener("input", () => {
+          rows[idx].price = inpPrice.value;
+          updateRowSum(idx);
+          updateGrandTotal();
         });
+        tdPrice.appendChild(inpPrice);
 
-        actions.appendChild(btnDup);
-        actions.appendChild(btnDel);
-        tdX.appendChild(actions);
+        // Menge
+        const tdQty = document.createElement("td");
+        const inpQty = document.createElement("input");
+        inpQty.className = "inp qty";
+        inpQty.type = "number";
+        inpQty.min = "0";
+        inpQty.step = "1";
+        inpQty.value = r.qty ?? 0;
+        inpQty.addEventListener("input", () => {
+          const v = Number(inpQty.value);
+          rows[idx].qty = Number.isFinite(v) ? v : 0;
+          updateRowSum(idx);
+          updateGrandTotal();
+        });
+        tdQty.appendChild(inpQty);
 
-        tr.appendChild(tdA);
-        tr.appendChild(tdP);
-        tr.appendChild(tdQ);
-        tr.appendChild(tdS);
-        tr.appendChild(tdX);
+        // Summe
+        const tdSum = document.createElement("td");
+        tdSum.style.textAlign = "right";
+        const sumBox = document.createElement("div");
+        sumBox.className = "sumBox";
+        sumBox.id = `sum_${idx}`;
+        sumBox.textContent = formatEuro(calcRowSum(rows[idx]));
+        tdSum.appendChild(sumBox);
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdPrice);
+        tr.appendChild(tdQty);
+        tr.appendChild(tdSum);
 
         tbody.appendChild(tr);
       });
 
-      updateTotals();
+      updateGrandTotal();
     }
 
-    document.getElementById("btnAddRow").addEventListener("click", () => {
-      state.rows.push(makeRow());
+    function calcRowSum(row){
+      const p = parseEuroInput(row.price);
+      const q = Number(row.qty) || 0;
+      return p * q;
+    }
+
+    function updateRowSum(idx){
+      const el = document.getElementById(`sum_${idx}`);
+      if (!el) return;
+      el.textContent = formatEuro(calcRowSum(rows[idx]));
+    }
+
+    function updateGrandTotal(){
+      const total = rows.reduce((acc, r) => acc + calcRowSum(r), 0);
+      grandTotalEl.textContent = formatEuro(total);
+    }
+
+    // ====== Buttons ======
+    document.getElementById("addRowBtn").addEventListener("click", () => {
+      rows.push(newRow());
       render();
-      autosave();
+      // Nach unten scrollen (komfortabel)
+      const sc = document.querySelector(".table-scroll");
+      sc.scrollTop = sc.scrollHeight;
     });
 
-    document.getElementById("btnSave").addEventListener("click", () => {
-      autosave();
-      alert("Gespeichert.");
+    document.getElementById("resetQtyBtn").addEventListener("click", () => {
+      // Mengen zurücksetzen: Menge=0, Summen aktualisieren (Preis/Artikel bleibt)
+      rows = rows.map(r => ({ ...r, qty: 0 }));
+      render();
     });
 
-    document.getElementById("btnResetQty").addEventListener("click", () => {
-      if (!confirm("Nur die Mengen zurücksetzen? (Artikel & Preise bleiben erhalten)")) return;
-      for (const r of state.rows) r.qtyStr = "";
-      render(); autosave();
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+        alert("Gespeichert.");
+      }catch(e){
+        alert("Speichern hat nicht geklappt (Browser blockiert ggf. Speicher).");
+      }
     });
 
-    // Init
-    const ok = load();
-    if (!ok){
-      state.rows = [];
-      for (let i=0; i<DEFAULT_ROWS; i++) state.rows.push(makeRow());
-    }
+    document.getElementById("loadBtn").addEventListener("click", () => {
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw){
+          alert("Noch kein gespeicherter Stand gefunden.");
+          return;
+        }
+        const parsed = JSON.parse(raw);
+        if(!Array.isArray(parsed)) throw new Error("Invalid");
+        // Sanitize
+        rows = parsed.map(x => ({
+          name: String(x?.name ?? ""),
+          price: String(x?.price ?? ""),
+          qty: Number(x?.qty ?? 0) || 0
+        }));
+        if(rows.length === 0){
+          rows = Array.from({length: START_ROWS}, () => newRow());
+        }
+        render();
+        alert("Geladen.");
+      }catch(e){
+        alert("Laden hat nicht geklappt (gespeicherte Daten beschädigt).");
+      }
+    });
+
+    // ====== Init ======
+    rows = Array.from({length: START_ROWS}, () => newRow());
     render();
   </script>
 </body>
 </html>
+
+    
+   
+    
+   
+ 
+
+ 
+  
+   
+       
+
+  
+
+   
 
 
 
