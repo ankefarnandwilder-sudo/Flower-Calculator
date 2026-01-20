@@ -1,0 +1,549 @@
+
+      --muted:#666;
+      --line:#e8e8e8;
+
+      /* Buttons / Akzente */
+      --sage:#6f8f7a;       /* Salbei */
+      --sage-2:#5f7f6a;
+      --sand:#c7b29a;       /* Sand/Beige */
+      --sand-2:#b59f86;
+
+      --card:#fbfbfb;
+      --focus:#5a8cff;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:16px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    header{
+      margin: 6px 0 14px;
+      text-align:center;
+    }
+
+    h1{
+      margin:0;
+      font-size:1.45rem;
+      letter-spacing:.2px;
+    }
+
+    .sub{
+      margin:6px auto 0;
+      color:var(--muted);
+      font-size:.95rem;
+      max-width: 760px;
+      line-height:1.35;
+    }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      margin:14px 0 10px;
+    }
+
+    button{
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 44px;
+      background:#f3f3f3;
+      color: var(--text);
+    }
+    button:active{transform: translateY(1px)}
+    .btn-sage{
+      background: var(--sage);
+      color:#fff;
+      border-color: var(--sage);
+    }
+    .btn-sage:hover{background: var(--sage-2); border-color: var(--sage-2);}
+    .btn-sand{
+      background: var(--sand);
+      color:#1f1f1f;
+      border-color: var(--sand);
+    }
+    .btn-sand:hover{background: var(--sand-2); border-color: var(--sand-2);}
+
+    .btn-ghost{
+      background: #f7f7f7;
+      border-color: #e2e2e2;
+    }
+    .btn-ghost:hover{border-color:#cfcfcf}
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:center;
+      margin: 8px 0 14px;
+    }
+
+    select, input[type="text"]{
+      min-height:44px;
+      border-radius:12px;
+      border:1px solid #d7d7d7;
+      padding:10px 12px;
+      background:#fff;
+      color:var(--text);
+      font-weight:600;
+    }
+
+    .card{
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    table{
+      width:100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius: 14px;
+    }
+
+    thead th{
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background:#f3f3f3;
+      text-align:left;
+      font-size:.9rem;
+      color:#333;
+      padding: 10px 8px;
+      border-bottom:1px solid var(--line);
+    }
+
+    tbody td{
+      padding: 10px 8px;
+      border-bottom:1px solid var(--line);
+      vertical-align: middle;
+    }
+
+    .right{text-align:right}
+    .center{text-align:center}
+
+    .name{
+      width: 100%;
+      min-width: 170px;
+      font-weight:700;
+    }
+
+    .price, .qty{
+      width: 120px;
+      text-align:right;
+      font-size: 16px;
+      border-radius: 12px;
+      border:1px solid #cfcfcf;
+      padding: 10px 10px;
+      min-height:44px;
+      background:#fff;
+    }
+
+    .price:focus, .qty:focus, input[type="text"]:focus, select:focus{
+      outline:none;
+      border-color: var(--focus);
+      box-shadow: 0 0 0 3px rgba(90,140,255,.18);
+    }
+
+    .sum{
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .muted{color:var(--muted)}
+    .small{font-size:.9rem}
+
+    .actions{
+      display:flex;
+      gap:8px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .icon-btn{
+      border-radius: 12px;
+      min-height: 40px;
+      padding: 8px 10px;
+      border:1px solid #e1e1e1;
+      background:#fff;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .icon-btn:hover{border-color:#cfcfcf}
+
+    .totalbar{
+      margin-top: 12px;
+      position: sticky;
+      bottom: 10px;
+      background: #ffffff;
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    }
+
+    .totalbar .label{
+      font-weight:900;
+      font-size:1.05rem;
+    }
+    .totalbar .value{
+      font-weight:900;
+      font-size:1.35rem;
+      white-space:nowrap;
+    }
+
+    .hint{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size:.9rem;
+      text-align:center;
+    }
+
+    @media (max-width: 720px){
+      body{margin:12px}
+      thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4){
+        text-align:right;
+      }
+      .price, .qty{width: 110px}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Blumen-Kalkulator</h1>
+    <div class="sub">
+      Für Tagespreise & schnelle Strauß-/Werkstück-Summen – ohne Taschenrechner, ohne Werbung, alles lokal.
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn-sage" id="btnNewOrder">Neuer Auftrag (Mengen leeren)</button>
+    <button class="btn-ghost" id="btnAdd">+ Artikel hinzufügen</button>
+    <button class="btn-sand" id="btnSavePreset">Tagespreise speichern</button>
+
+    <div class="row" style="margin:0">
+      <label class="small muted" for="presetSelect">Preset:</label>
+      <select id="presetSelect" title="Gespeicherte Tagespreise laden"></select>
+      <button class="btn-ghost" id="btnLoadPreset">Laden</button>
+      <button class="btn-ghost" id="btnDeletePreset">Preset löschen</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <table aria-label="Blumen-Kalkulation">
+      <thead>
+        <tr>
+          <th>Artikel</th>
+          <th class="right">Preis (€)</th>
+          <th class="right">Menge</th>
+          <th class="right">Summe</th>
+          <th class="center"> </th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+
+    <div class="totalbar" role="status" aria-live="polite">
+      <div>
+        <div class="label">Gesamtsumme</div>
+        <div class="small muted">Auto-Speicherung aktiv (Entwurf bleibt erhalten)</div>
+      </div>
+      <div class="value" id="grandTotal">0,00&nbsp;€</div>
+    </div>
+
+    <div class="hint">
+      Tipp: Preise als „Tagespreise“ speichern → dann nur Mengen tippen → fertig.
+    </div>
+  </div>
+</div>
+
+<script>
+  const KEY_DRAFT  = "florcalc_draft_v1";
+  const KEY_PRESET = "florcalc_presets_v1";
+
+  const fmtEUR = (num) =>
+    num.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+
+  const defaultItems = [
+    { name: "Rose",        price: "" },
+    { name: "Tulpe",       price: "" },
+    { name: "Ranunkel",    price: "" },
+    { name: "Eukalyptus",  price: "" },
+    { name: "Schleierkraut", price: "" },
+    { name: "Hortensie",   price: "" },
+    { name: "Limonium",    price: "" },
+    { name: "Chrysantheme", price: "" },
+    { name: "Distel",      price: "" },
+    { name: "Grünmix",     price: "" }
+  ];
+
+  const state = {
+    rows: [] // {id, name, price, qty}
+  };
+
+  const rowsEl = document.getElementById("rows");
+  const grandEl = document.getElementById("grandTotal");
+  const presetSelect = document.getElementById("presetSelect");
+
+  function uid(){
+    return (crypto.randomUUID ? crypto.randomUUID() : (Date.now()+"_"+Math.random().toString(16).slice(2)));
+  }
+
+  function parseNumber(value){
+    // erlaubt 12,5 oder 12.5
+    const v = String(value || "").trim().replace(",", ".");
+    if (v === "") return 0;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function readPresets(){
+    try { return JSON.parse(localStorage.getItem(KEY_PRESET) || "{}"); }
+    catch { return {}; }
+  }
+
+  function writePresets(obj){
+    localStorage.setItem(KEY_PRESET, JSON.stringify(obj));
+  }
+
+  function saveDraft(){
+    localStorage.setItem(KEY_DRAFT, JSON.stringify({ savedAt: Date.now(), rows: state.rows }));
+  }
+
+  function loadDraft(){
+    try{
+      const d = JSON.parse(localStorage.getItem(KEY_DRAFT) || "null");
+      if (d && Array.isArray(d.rows) && d.rows.length){
+        state.rows = d.rows;
+        return true;
+      }
+    } catch {}
+    return false;
+  }
+
+  function buildDefault(){
+    state.rows = defaultItems.map(it => ({ id: uid(), name: it.name, price: it.price, qty: "" }));
+  }
+
+  function compute(){
+    let total = 0;
+    for (const r of state.rows){
+      const price = parseNumber(r.price);
+      const qty   = parseNumber(r.qty);
+      total += price * qty;
+    }
+    grandEl.innerHTML = fmtEUR(total).replace(" €", "&nbsp;€");
+    saveDraft();
+  }
+
+  function render(){
+    rowsEl.innerHTML = "";
+    for (const r of state.rows){
+      const tr = document.createElement("tr");
+
+      // Name
+      const tdName = document.createElement("td");
+      const nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.className = "name";
+      nameInput.value = r.name || "";
+      nameInput.placeholder = "Artikel (z. B. Rose)";
+      nameInput.addEventListener("input", () => {
+        r.name = nameInput.value;
+        compute();
+      });
+      tdName.appendChild(nameInput);
+
+      // Price
+      const tdPrice = document.createElement("td");
+      tdPrice.className = "right";
+      const priceInput = document.createElement("input");
+      priceInput.type = "text";
+      priceInput.inputMode = "decimal";
+      priceInput.className = "price";
+      priceInput.placeholder = "0,00";
+      priceInput.value = r.price ?? "";
+      priceInput.addEventListener("input", () => {
+        r.price = priceInput.value;
+        updateRowSum(tr, r);
+        compute();
+      });
+      tdPrice.appendChild(priceInput);
+
+      // Qty
+      const tdQty = document.createElement("td");
+      tdQty.className = "right";
+      const qtyInput = document.createElement("input");
+      qtyInput.type = "text";
+      qtyInput.inputMode = "numeric";
+      qtyInput.className = "qty";
+      qtyInput.placeholder = "0";
+      qtyInput.value = r.qty ?? "";
+      qtyInput.addEventListener("input", () => {
+        r.qty = qtyInput.value;
+        updateRowSum(tr, r);
+        compute();
+      });
+      tdQty.appendChild(qtyInput);
+
+      // Sum
+      const tdSum = document.createElement("td");
+      tdSum.className = "right sum";
+      tdSum.dataset.role = "sum";
+      tdSum.textContent = "—";
+
+      // Actions
+      const tdAct = document.createElement("td");
+      tdAct.className = "center";
+      const delBtn = document.createElement("button");
+      delBtn.className = "icon-btn";
+      delBtn.title = "Zeile löschen";
+      delBtn.textContent = "✕";
+      delBtn.addEventListener("click", () => {
+        state.rows = state.rows.filter(x => x.id !== r.id);
+        render();
+        compute();
+      });
+      tdAct.appendChild(delBtn);
+
+      tr.appendChild(tdName);
+      tr.appendChild(tdPrice);
+      tr.appendChild(tdQty);
+      tr.appendChild(tdSum);
+      tr.appendChild(tdAct);
+
+      rowsEl.appendChild(tr);
+      updateRowSum(tr, r);
+    }
+    compute();
+  }
+
+  function updateRowSum(tr, r){
+    const td = tr.querySelector('[data-role="sum"]');
+    const price = parseNumber(r.price);
+    const qty   = parseNumber(r.qty);
+    const s = price * qty;
+    td.textContent = s > 0 ? fmtEUR(s) : "—";
+  }
+
+  function clearQuantities(){
+    for (const r of state.rows){
+      r.qty = "";
+    }
+    render();
+  }
+
+  function addRow(){
+    state.rows.push({ id: uid(), name: "", price: "", qty: "" });
+    render();
+  }
+
+  function refreshPresetSelect(){
+    const presets = readPresets();
+    const names = Object.keys(presets).sort((a,b) => a.localeCompare(b, "de-DE"));
+    presetSelect.innerHTML = "";
+    const opt0 = document.createElement("option");
+    opt0.value = "";
+    opt0.textContent = "— auswählen —";
+    presetSelect.appendChild(opt0);
+    for (const n of names){
+      const opt = document.createElement("option");
+      opt.value = n;
+      opt.textContent = n;
+      presetSelect.appendChild(opt);
+    }
+  }
+
+  function savePreset(){
+    const name = prompt("Name für Tagespreise (z. B. Montag / Winterpreise / Tatjana):");
+    if (!name) return;
+
+    // Wir speichern NUR Name + Preis (Mengen bleiben leer)
+    const data = state.rows.map(r => ({
+      name: (r.name || "").trim(),
+      price: (r.price || "").trim()
+    })).filter(x => x.name !== "" || x.price !== "");
+
+    const presets = readPresets();
+    presets[name.trim()] = { savedAt: Date.now(), rows: data };
+    writePresets(presets);
+    refreshPresetSelect();
+    presetSelect.value = name.trim();
+    alert("Tagespreise gespeichert.");
+  }
+
+  function loadPreset(){
+    const key = presetSelect.value;
+    if (!key) { alert("Bitte erst ein Preset auswählen."); return; }
+
+    const presets = readPresets();
+    const p = presets[key];
+    if (!p || !Array.isArray(p.rows)) { alert("Preset nicht gefunden."); return; }
+
+    // Beim Laden: Preise/Artikel aus Preset, Mengen leer
+    state.rows = p.rows.map(x => ({
+      id: uid(),
+      name: x.name ?? "",
+      price: x.price ?? "",
+      qty: ""
+    }));
+
+    // Fallback: falls sehr wenig drin ist, hängen wir 1 leere Zeile an
+    if (state.rows.length === 0) state.rows.push({ id: uid(), name: "", price: "", qty: "" });
+
+    render();
+  }
+
+  function deletePreset(){
+    const key = presetSelect.value;
+    if (!key) { alert("Bitte erst ein Preset auswählen."); return; }
+    if (!confirm(`Preset „${key}“ wirklich löschen?`)) return;
+
+    const presets = readPresets();
+    delete presets[key];
+    writePresets(presets);
+    refreshPresetSelect();
+    presetSelect.value = "";
+    alert("Preset gelöscht.");
+  }
+
+  // Buttons
+  document.getElementById("btnNewOrder").addEventListener("click", () => {
+    if (!confirm("Neuen Auftrag starten? (Nur Mengen werden geleert – Preise bleiben.)")) return;
+    clearQuantities();
+  });
+
+  document.getElementById("btnAdd").addEventListener("click", addRow);
+  document.getElementById("btnSavePreset").addEventListener("click", savePreset);
+  document.getElementById("btnLoadPreset").addEventListener("click", loadPreset);
+  document.getElementById("btnDeletePreset").addEventListener("click", deletePreset);
+
+  // Start
+  refreshPresetSelect();
+  if (!loadDraft()){
+    buildDefault();
+  }
+  render();
+</script>
+</body>
+</html>
