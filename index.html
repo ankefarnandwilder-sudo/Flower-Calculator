@@ -1,439 +1,239 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Flower Calculator</title>
-  <style>
-    :root{
-      --bg:#ffffff;
-      --text:#111;
-      --muted:#666;
-      --line:#e8e8e8;
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artikel- & Blumen-Kalkulator</title>
 
-      /* Button-Farben (wie gewünscht: nur Buttons, Hintergrund weiß) */
-      --btn-sage:#5f7f6a;   /* Salbei (mittel) */
-      --btn-sand:#b59f86;   /* Sand/Beige (mittel) */
+<style>
+  :root{
+    --bg:#ffffff;
+    --text:#222;
+    --line:#ddd;
+    --btn:#e6e6e6;
+    --btn-hover:#dcdcdc;
+    --btn-clear:#b5b5b5;      /* ← mittleres Grau statt Rot */
+    --btn-clear-hover:#9e9e9e;
+  }
 
-      --shadow: 0 6px 18px rgba(0,0,0,.06);
-      --radius: 14px;
-    }
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: var(--bg);
-      color: var(--text);
-    }
+  .wrap{
+    max-width:900px;
+    margin:24px auto;
+    padding:16px;
+  }
 
-    .wrap{
-      max-width: 1120px;
-      margin: 28px auto;
-      padding: 0 16px 40px;
-    }
+  h1{
+    margin:0 0 12px;
+    font-size:1.4rem;
+    text-align:center;
+  }
 
-    header{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom: 14px;
-    }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:16px;
+  }
 
-    h1{
-      font-size: 32px;
-      margin:0;
-      letter-spacing: .2px;
-    }
+  th,td{
+    border-bottom:1px solid var(--line);
+    padding:10px;
+    text-align:right;
+  }
 
-    .sub{
-      margin-top:6px;
-      color_toggle: var(--muted);
-      color: var(--muted);
-      font-size: 14px;
-    }
+  th:first-child,
+  td:first-child{
+    text-align:left;
+  }
 
-    .card{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
+  input{
+    width:100%;
+    box-sizing:border-box;
+    padding:8px;
+    font-size:16px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    text-align:right;
+  }
 
-    .toolbar{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      padding: 14px 14px 12px;
-      border-bottom:1px solid var(--line);
-    }
+  input[name="name"]{
+    text-align:left;
+  }
 
-    .toolbar .spacer{flex:1}
+  .buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
 
-    button{
-      border:0;
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-weight: 600;
-      cursor:pointer;
-      transition: transform .03s ease, opacity .2s ease;
-      white-space:nowrap;
-    }
-    button:active{ transform: translateY(1px); }
-    button.secondary{ background: #f3f3f3; color:#111; border:1px solid var(--line); }
-    button.sage{ background: var(--btn-sage); color:#fff; }
-    button.sand{ background: var(--btn-sand); color:#fff; }
-    button.danger{ background:#e64646; color:#fff; }
+  button{
+    padding:10px 14px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--btn);
+    cursor:pointer;
+    font-weight:600;
+  }
 
-    .table-wrap{
-      overflow:auto;
-    }
+  button:hover{
+    background:var(--btn-hover);
+  }
 
-    table{
-      width:100%;
-      border-collapse: collapse;
-      min-width: 860px;
-    }
+  .clear{
+    background:var(--btn-clear);
+  }
 
-    thead th{
-      text-align:left;
-      font-size: 13px;
-      color: var(--muted);
-      padding: 12px 14px;
-      border-bottom:1px solid var(--line);
-      background:#fff;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
+  .clear:hover{
+    background:var(--btn-clear-hover);
+  }
 
-    tbody td{
-      padding: 10px 14px;
-      border-bottom:1px solid var(--line);
-      vertical-align: middle;
-    }
+  .total{
+    font-size:1.4rem;
+    font-weight:700;
+    text-align:center;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:12px;
+  }
 
-    tbody tr:hover{ background:#fcfcfc; }
+  .row-actions{
+    display:flex;
+    gap:6px;
+  }
 
-    input[type="text"], input[type="number"]{
-      width: 100%;
-      padding: 10px 10px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      outline:none;
-      font-size: 14px;
-      background:#fff;
-    }
-
-    input[type="number"]{
-      min-width: 140px;
-    }
-
-    .num{
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
-
-    .actions{
-      display:flex;
-      gap:8px;
-      justify-content:flex-end;
-    }
-
-    .iconbtn{
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      display:grid;
-      place-items:center;
-      background:#f3f3f3;
-      border:1px solid var(--line);
-      cursor:pointer;
-    }
-
-    .footer{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding: 14px;
-    }
-
-    .total{
-      font-size: 18px;
-      font-weight: 800;
-    }
-
-    .note{
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    @media (max-width: 720px){
-      h1{font-size:26px}
-      .toolbar{padding:12px}
-      .footer{flex-direction:column; align-items:flex-start}
-    }
-  </style>
+  .small-btn{
+    padding:6px 10px;
+    font-size:14px;
+  }
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <header>
-      <div>
-        <h1>Flower Calculator</h1>
-        <div class="sub">Artikel / Strauß / Werkstück kalkulieren – ohne Taschenrechner (offline nutzbar)</div>
-      </div>
-    </header>
+<div class="wrap">
+  <h1>Artikel- & Blumen-Kalkulator</h1>
 
-    <div class="card">
-      <!-- Buttons: vorne 2, rechts Reset -->
-      <div class="toolbar">
-        <button class="sage" id="addRowBtn">+ Artikel hinzufügen</button>
-        <button class="sand" id="saveBtn">Speichern</button>
+  <table id="table">
+    <thead>
+      <tr>
+        <th>Artikel</th>
+        <th>Einzelpreis €</th>
+        <th>Menge</th>
+        <th>Summe €</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Start mit vielen leeren Zeilen -->
+    </tbody>
+  </table>
 
-        <div class="spacer"></div>
-
-        <button class="secondary" id="loadBtn">Laden</button>
-        <button class="danger" id="resetBtn" title="Setzt nur die Tabelle zurück – nicht die Webseite.">Zurücksetzen</button>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:40%">Artikel / Blume</th>
-              <th style="width:20%">Einzelpreis (€)</th>
-              <th style="width:20%">Menge</th>
-              <th style="width:15%" class="num">Summe (€)</th>
-              <th style="width:5%" class="num">Aktion</th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
-      </div>
-
-      <div class="footer">
-        <div class="total">Gesamtsumme: <span id="grandTotal">0,00 €</span></div>
-        <div class="note">Tipp: Preis mit Komma (z. B. 4,50) oder Punkt (4.50) – beides funktioniert.</div>
-      </div>
-    </div>
+  <div class="buttons">
+    <button onclick="addRow()">Artikel hinzufügen</button>
+    <button onclick="saveData()">Speichern</button>
+    <button class="clear" onclick="clearAll()">Alles löschen</button>
   </div>
 
-  <script>
-    // ---------- Zahl sauber parsen (DE/EN) ----------
-    function parseNum(val) {
-      if (val === null || val === undefined) return 0;
-      let s = String(val).trim();
-      if (s === "") return 0;
+  <div class="total">
+    Gesamt: <span id="grandTotal">0,00 €</span>
+  </div>
+</div>
 
-      // Wenn Komma enthalten → deutsches Format
-      if (s.includes(",")) {
-        s = s.replace(/\./g, ""); // Tausenderpunkte weg
-        s = s.replace(",", ".");  // Komma → Dezimalpunkt
-      }
-      // Wenn kein Komma → Punkt ist Dezimalpunkt
+<script>
+const tbody = document.querySelector("#table tbody");
+const STORAGE_KEY = "flower_calculator_v1";
 
-      const n = Number(s);
-      return Number.isFinite(n) ? n : 0;
-    }
+function addRow(data={name:"",price:"",qty:""}) {
+  const tr = document.createElement("tr");
 
-    function formatEuro(n){
-      const x = (Number.isFinite(n) ? n : 0);
-      return x.toLocaleString("de-DE", { style:"currency", currency:"EUR" });
-    }
+  tr.innerHTML = `
+    <td><input name="name" value="${data.name}"></td>
+    <td><input name="price" type="number" step="0.01" value="${data.price}"></td>
+    <td><input name="qty" type="number" step="1" value="${data.qty}"></td>
+    <td class="sum">0,00</td>
+    <td class="row-actions">
+      <button class="small-btn" onclick="duplicateRow(this)">⧉</button>
+      <button class="small-btn" onclick="deleteRow(this)">✕</button>
+    </td>
+  `;
 
-    // ---------- State ----------
-    const rowsEl = document.getElementById("rows");
-    const grandTotalEl = document.getElementById("grandTotal");
+  tbody.appendChild(tr);
+  tr.querySelectorAll("input").forEach(i=>i.addEventListener("input",update));
+  update();
+}
 
-    const STORAGE_KEY = "flower_calculator_rows_v1";
+function update(){
+  let total=0;
+  tbody.querySelectorAll("tr").forEach(tr=>{
+    const price = parseFloat(tr.querySelector('[name="price"]').value) || 0;
+    const qty   = parseFloat(tr.querySelector('[name="qty"]').value) || 0;
+    const sum = price * qty;
+    tr.querySelector(".sum").textContent = sum.toLocaleString("de-DE",{minimumFractionDigits:2}) ;
+    total += sum;
+  });
+  document.getElementById("grandTotal").textContent =
+    total.toLocaleString("de-DE",{minimumFractionDigits:2}) + " €";
+}
 
-    // Start-Artikel (kannst du jederzeit überschreiben)
-    const DEFAULT_ROWS = [
-      { item: "Rose", price: "4,50", qty: "1" },
-      { item: "Tulpe", price: "1,40", qty: "10" },
-      { item: "Eukalyptus", price: "3,20", qty: "2" },
-      { item: "Band", price: "0,80", qty: "1" }
-    ];
+function deleteRow(btn){
+  btn.closest("tr").remove();
+  update();
+}
 
-    let state = [];
+function duplicateRow(btn){
+  const tr = btn.closest("tr");
+  addRow({
+    name: tr.querySelector('[name="name"]').value,
+    price: tr.querySelector('[name="price"]').value,
+    qty: tr.querySelector('[name="qty"]').value
+  });
+}
 
-    // ---------- Render ----------
-    function makeActionButton(svg, title){
-      const b = document.createElement("button");
-      b.className = "iconbtn";
-      b.type = "button";
-      b.title = title;
-      b.innerHTML = svg;
-      return b;
-    }
+function clearAll(){
+  if(!confirm("Alle Artikelzeilen löschen?")) return;
+  tbody.innerHTML="";
+  for(let i=0;i<20;i++) addRow();
+  update();
+}
 
-    function render(){
-      rowsEl.innerHTML = "";
-      state.forEach((r, idx) => {
-        const tr = document.createElement("tr");
-
-        // Item
-        const tdItem = document.createElement("td");
-        const inItem = document.createElement("input");
-        inItem.type = "text";
-        inItem.value = r.item ?? "";
-        inItem.placeholder = "z. B. Rose, Tulpe, Eukalyptus, Vase …";
-        inItem.addEventListener("input", () => { state[idx].item = inItem.value; });
-        tdItem.appendChild(inItem);
-
-        // Price
-        const tdPrice = document.createElement("td");
-        const inPrice = document.createElement("input");
-        inPrice.type = "text"; // absichtlich text: damit Komma zuverlässig geht
-        inPrice.inputMode = "decimal";
-        inPrice.value = r.price ?? "";
-        inPrice.placeholder = "z. B. 4,50";
-        inPrice.addEventListener("input", () => { state[idx].price = inPrice.value; recalc(); });
-        tdPrice.appendChild(inPrice);
-
-        // Qty
-        const tdQty = document.createElement("td");
-        const inQty = document.createElement("input");
-        inQty.type = "number";
-        inQty.step = "1";
-        inQty.min = "0";
-        inQty.value = r.qty ?? "";
-        inQty.addEventListener("input", () => { state[idx].qty = inQty.value; recalc(); });
-        tdQty.appendChild(inQty);
-
-        // Sum
-        const tdSum = document.createElement("td");
-        tdSum.className = "num";
-        tdSum.id = `sum-${idx}`;
-
-        // Actions
-        const tdAct = document.createElement("td");
-        tdAct.className = "num";
-        const actWrap = document.createElement("div");
-        actWrap.className = "actions";
-
-        const dupBtn = makeActionButton(
-          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 8h10v10H8V8Z" stroke="currentColor" stroke-width="2"/><path d="M6 16H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2"/></svg>',
-          "Duplizieren"
-        );
-        dupBtn.addEventListener("click", () => {
-          state.splice(idx + 1, 0, { ...state[idx] });
-          render();
-          recalc();
-        });
-
-        const delBtn = makeActionButton(
-          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 7h12" stroke="currentColor" stroke-width="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="2"/><path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2"/><path d="M8 7l1 14h6l1-14" stroke="currentColor" stroke-width="2"/></svg>',
-          "Zeile löschen"
-        );
-        delBtn.addEventListener("click", () => {
-          state.splice(idx, 1);
-          if (state.length === 0) state.push({ item:"", price:"", qty:"" });
-          render();
-          recalc();
-        });
-
-        actWrap.appendChild(dupBtn);
-        actWrap.appendChild(delBtn);
-        tdAct.appendChild(actWrap);
-
-        tr.appendChild(tdItem);
-        tr.appendChild(tdPrice);
-        tr.appendChild(tdQty);
-        tr.appendChild(tdSum);
-        tr.appendChild(tdAct);
-
-        rowsEl.appendChild(tr);
-      });
-
-      recalc();
-    }
-
-    // ---------- Recalc ----------
-    function recalc(){
-      let total = 0;
-      state.forEach((r, idx) => {
-        const price = parseNum(r.price);
-        const qty = parseNum(r.qty);
-        const sum = price * qty;
-        total += sum;
-
-        const td = document.getElementById(`sum-${idx}`);
-        if (td) td.textContent = formatEuro(sum);
-      });
-      grandTotalEl.textContent = formatEuro(total);
-    }
-
-    // ---------- Actions ----------
-    document.getElementById("addRowBtn").addEventListener("click", () => {
-      state.push({ item:"", price:"", qty:"" });
-      render();
-      // nach unten scrollen
-      window.setTimeout(() => {
-        rowsEl.lastElementChild?.scrollIntoView({ behavior:"smooth", block:"end" });
-      }, 0);
+function saveData(){
+  const data=[];
+  tbody.querySelectorAll("tr").forEach(tr=>{
+    data.push({
+      name: tr.querySelector('[name="name"]').value,
+      price: tr.querySelector('[name="price"]').value,
+      qty: tr.querySelector('[name="qty"]').value
     });
+  });
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+  alert("Gespeichert.");
+}
 
-    document.getElementById("saveBtn").addEventListener("click", () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      alert("Gespeichert ✅");
-    });
+function loadData(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){
+    JSON.parse(raw).forEach(d=>addRow(d));
+  }else{
+    for(let i=0;i<20;i++) addRow();
+  }
+}
 
-    document.getElementById("loadBtn").addEventListener("click", () => {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) { alert("Noch nichts gespeichert."); return; }
-      try{
-        const data = JSON.parse(raw);
-        if (Array.isArray(data) && data.length){
-          state = data;
-          render();
-          alert("Geladen ✅");
-        } else {
-          alert("Gespeicherte Daten sind leer.");
-        }
-      } catch(e){
-        alert("Speicherdatei konnte nicht gelesen werden.");
-      }
-    });
-
-    document.getElementById("resetBtn").addEventListener("click", () => {
-      const ok = confirm("Wirklich alle Zeilen & Eingaben zurücksetzen?\n(Das löscht NICHT die Webseite – nur die Tabelle.)");
-      if (!ok) return;
-      state = [{ item:"", price:"", qty:"" }];
-      render();
-      recalc();
-    });
-
-    // ---------- Init ----------
-    // Start: wenn es schon gespeicherte Daten gibt → nutzen, sonst Default
-    (function init(){
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw){
-        try{
-          const data = JSON.parse(raw);
-          if (Array.isArray(data) && data.length){
-            state = data;
-            render();
-            return;
-          }
-        } catch(e){}
-      }
-      // Default initialisieren
-      state = DEFAULT_ROWS.map(x => ({...x}));
-      render();
-    })();
-  </script>
+loadData();
+</script>
 </body>
 </html>
 
-   
 
+    
+   
+  
+      
 
  
 
