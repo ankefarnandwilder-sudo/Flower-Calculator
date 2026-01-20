@@ -3,515 +3,533 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Preisrechner – offline</title>
+  <title>Preisrechner offline</title>
   <style>
     :root{
-      --bg:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --line:#e5e7eb;
+      --bg:#fff;
+      --text:#2b2b2b;
+      --muted:#6b6b6b;
+      --line:#e7e7e7;
+      --card:#fbfbfb;
 
-      /* Akzentfarben (Salbei & Sand) */
-      --sage:#4f6f64;
-      --sand:#8a6a4d;
+      --sage:#5f7f73;   /* Salbei */
+      --sand:#b08a62;   /* Sand */
+      --btnText:#fff;
 
-      --btnText:#ffffff;
-      --btnBorder:#d1d5db;
-      --shadow:0 1px 0 rgba(0,0,0,.04);
-      --radius:12px;
+      --radius:14px;
+      --shadow:0 8px 20px rgba(0,0,0,.06);
     }
-
     *{box-sizing:border-box}
     body{
-      margin:16px;
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       background:var(--bg);
       color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     }
-    .wrap{max-width:920px;margin:0 auto}
-
+    .wrap{
+      max-width:980px;
+      margin:18px auto 28px;
+      padding:0 14px;
+    }
     h1{
-      margin:0 0 10px;
+      margin:0 0 8px;
       text-align:center;
-      font-size:1.35rem;
+      font-size:1.45rem;
       letter-spacing:.2px;
     }
     .sub{
-      text-align:center;
+      margin:0 auto 12px;
+      max-width:820px;
       color:var(--muted);
-      margin:0 0 14px;
       font-size:.95rem;
+      line-height:1.35;
+      text-align:center;
+    }
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:12px;
     }
 
-    .topbar{
+    .bar{
       display:flex;
-      gap:10px;
       flex-wrap:wrap;
+      gap:10px;
       justify-content:center;
       align-items:center;
-      margin:12px 0 14px;
+      margin:6px 0 10px;
     }
 
     button{
-      border:1px solid var(--btnBorder);
-      background:#f7f7f7;
-      color:var(--text);
-      border-radius:10px;
-      padding:10px 12px;
+      border:none;
+      border-radius:12px;
+      padding:10px 14px;
       font-weight:800;
       cursor:pointer;
       min-height:44px;
-      box-shadow:var(--shadow);
+      color:var(--btnText);
+      letter-spacing:.2px;
+      transition:opacity .15s ease, transform .04s ease;
+      user-select:none;
     }
-    button:hover{border-color:#9ca3af}
-    .btn-sage{background:var(--sage);border-color:transparent;color:var(--btnText)}
-    .btn-sand{background:var(--sand);border-color:transparent;color:var(--btnText)}
-    .btn-ghost{background:#fff}
+    button:active{ transform:translateY(1px); }
+    button:hover{ opacity:.92; }
 
-    .card{
+    .btn-sage{ background:var(--sage); }
+    .btn-sand{ background:var(--sand); }
+
+    /* Grau statt Rot */
+    .btn-ghost{
+      background:#f2f2f2;
+      color:var(--text);
+      border:1px solid #dadada;
+      font-weight:800;
+    }
+    .btn-ghost:hover{ opacity:1; background:#ededed; }
+
+    .tableWrap{
       border:1px solid var(--line);
-      border-radius:var(--radius);
-      background:#fff;
-      overflow:hidden;
-      box-shadow:var(--shadow);
-    }
-
-    .tablewrap{
-      max-height:62vh;
+      border-radius:12px;
       overflow:auto;
+      background:#fff;
+      /* genug sichtbar + scroll, auch am Handy */
+      max-height:70vh;
     }
 
     table{
       width:100%;
       border-collapse:collapse;
-      table-layout:fixed;
+      background:#fff;
+      min-width:700px; /* damit Spalten am Desktop stabil bleiben */
     }
-
-    th,td{
-      border-bottom:1px solid var(--line);
-      padding:10px 8px;
-      vertical-align:top;
-    }
-
-    th{
-      position:sticky;
-      top:0;
-      z-index:2;
-      background:#f3f4f6;
-      color:#111827;
+    thead th{
+      background:#f3f3f3;
       font-size:.92rem;
       text-align:left;
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      z-index:1;
+      white-space:nowrap;
     }
+    tbody td{
+      padding:8px 10px;
+      border-bottom:1px solid var(--line);
+      vertical-align:middle;
+    }
+    tbody tr:last-child td{ border-bottom:none; }
 
-    /* Spaltenbreiten mobilfreundlich */
-    col.col-item{width:40%}
-    col.col-price{width:20%}
-    col.col-qty{width:14%}
-    col.col-sum{width:26%}
+    .col-article{ width:48%; }
+    .col-price{ width:18%; }
+    .col-qty{ width:14%; }
+    .col-sum{ width:16%; }
+    .col-actions{ width:4%; }
 
     input[type="text"], input[type="number"]{
       width:100%;
       min-height:42px;
-      padding:10px 10px;
-      border:1px solid #cfcfcf;
-      border-radius:10px;
+      padding:8px 10px;
+      border:1px solid #d7d7d7;
+      border-radius:12px;
       font-size:16px;
+      outline:none;
       background:#fff;
     }
+    input[type="number"]{
+      text-align:right;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button{
+      -webkit-appearance:none;
+      margin:0;
+    }
+
     input:focus{
-      outline:none;
-      border-color:#93c5fd;
-      box-shadow:0 0 0 3px rgba(147,197,253,.25);
+      border-color:#8aa9ff;
+      box-shadow:0 0 0 3px rgba(138,169,255,.22);
     }
 
-    .num{ text-align:right; font-variant-numeric:tabular-nums; }
-
-    .sumcell{
-      font-variant-numeric:tabular-nums;
-    }
-
-    .sumwrap{
-      display:flex;
-      flex-direction:column;
-      align-items:flex-end;
-      gap:6px;
-    }
-
-    .sumtext{
-      width:100%;
+    .sumCell{
       text-align:right;
       font-weight:900;
-      color:#111827;
+      white-space:nowrap;
+    }
+    .mutedCell{
+      color:var(--muted);
+      font-weight:800;
     }
 
-    .actions{
+    .rowActions{
       display:flex;
       gap:8px;
       justify-content:flex-end;
-      flex-wrap:wrap;
+      align-items:center;
     }
-
-    .smallbtn{
+    .mini{
+      min-height:40px;
       padding:8px 10px;
-      min-height:38px;
-      font-weight:800;
-      border-radius:10px;
-      background:#fff;
-    }
-
-    .footerbar{
-      margin-top:12px;
-      display:flex;
+      border-radius:12px;
+      font-weight:900;
+      line-height:1;
+      width:42px;
+      display:inline-flex;
       justify-content:center;
+      align-items:center;
     }
 
     .total{
-      width:100%;
+      margin-top:12px;
       border:1px solid var(--line);
-      border-radius:12px;
+      border-radius:14px;
       padding:12px;
-      text-align:center;
-      font-weight:900;
-      font-size:1.25rem;
-      background:#fafafa;
-      position:sticky;
-      bottom:10px;
-      box-shadow:var(--shadow);
+      background:#fff;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
     }
+    .total .label{ font-weight:900; font-size:1.05rem; }
+    .total .value{ font-weight:950; font-size:1.25rem; white-space:nowrap; }
 
-    .hint{
+    .foot{
+      margin-top:10px;
       color:var(--muted);
       font-size:.9rem;
-      line-height:1.35;
-      margin-top:10px;
       text-align:center;
+      line-height:1.35;
     }
 
-    @media (max-width:520px){
-      body{margin:12px}
-      col.col-item{width:38%}
-      col.col-price{width:22%}
-      col.col-qty{width:14%}
-      col.col-sum{width:26%}
-      th,td{padding:10px 6px}
+    @media (max-width:720px){
+      .wrap{ padding:0 10px; }
+      h1{ font-size:1.3rem; }
+      .sub{ font-size:.92rem; }
+      /* am Handy darf gescrollt werden */
+      table{ min-width:640px; }
+      .tableWrap{ max-height:72vh; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Preisrechner – offline</h1>
-    <div class="sub">Schnelle Preisberechnung. Speichert lokal im Browser (keine Cloud).</div>
+    <h1>Preisrechner offline</h1>
+    <p class="sub">
+      Artikel/Produkt/Leistung, Einzelpreis und Menge eingeben – Summen werden automatisch berechnet.
+      Speicherung lokal im Browser (keine Cloud).
+    </p>
 
-    <div class="topbar">
-      <button class="btn-sage" id="btnSave">Speichern</button>
-      <button class="btn-sand" id="btnRestore">Wiederherstellen</button>
-      <button class="btn-ghost" id="btnResetQty">Mengen zurücksetzen</button>
-      <button class="btn-ghost" id="btnAddRow">Zeile hinzufügen</button>
-    </div>
+    <div class="panel">
+      <div class="bar">
+        <button class="btn-sage" id="btnAddRow">+ Zeile hinzufügen</button>
+        <button class="btn-sand" id="btnSave">Speichern</button>
+        <button class="btn-ghost" id="btnRestore">Wiederherstellen</button>
+        <button class="btn-ghost" id="btnResetQty">Mengen zurücksetzen</button>
+      </div>
 
-    <div class="card">
-      <div class="tablewrap">
+      <div class="tableWrap" aria-label="Preisrechner Tabelle">
         <table>
-          <colgroup>
-            <col class="col-item" />
-            <col class="col-price" />
-            <col class="col-qty" />
-            <col class="col-sum" />
-          </colgroup>
           <thead>
             <tr>
-              <th>Artikel / Produkt / Leistung</th>
-              <th class="num">Einzelpreis (€)</th>
-              <th class="num">Menge</th>
-              <th class="num">Summe</th>
+              <th class="col-article">Artikel / Produkt / Leistung</th>
+              <th class="col-price">Einzelpreis (€)</th>
+              <th class="col-qty">Menge</th>
+              <th class="col-sum">Summe</th>
+              <th class="col-actions"></th>
             </tr>
           </thead>
-          <tbody id="tbody"></tbody>
+          <tbody id="rows"></tbody>
         </table>
       </div>
-    </div>
 
-    <div class="footerbar">
-      <div class="total">Gesamt: <span id="grandTotal">0,00&nbsp;€</span></div>
-    </div>
+      <div class="total">
+        <div class="label">Gesamtsumme</div>
+        <div class="value" id="grandTotal">0,00&nbsp;€</div>
+      </div>
 
-    <div class="hint">
-      Einzelpreis: einfach <b>450</b> tippen → wird <b>4,50</b> (Komma optional).<br/>
-      Alles bleibt auf deinem Gerät.
+      <div class="foot">
+        Offline, werbefrei, ohne Registrierung.
+      </div>
     </div>
   </div>
 
   <script>
-    const DEFAULT_ROWS = 15;
-    const KEY_DRAFT = "pricecalc_draft_v1";
-    const KEY_SAVED = "pricecalc_saved_v1";
+    const KEY = "price_calc_offline_v2";
+    const DEFAULT_ROWS = 15; // sichtbar + trotzdem scroll
 
-    const tbody = document.getElementById("tbody");
-    const grandTotalEl = document.getElementById("grandTotal");
-
-    const fmtEUR = (cents) => {
-      const n = (cents || 0) / 100;
-      return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "\u00A0€";
-    };
-
-    const clampInt = (v) => {
-      const n = parseInt(v, 10);
-      return Number.isFinite(n) && n >= 0 ? n : 0;
-    };
-
-    // "450" => 4,50 | "4,5" => 4,50 | "4.50" => 4,50
-    function parsePriceToCents(raw){
-      const s = String(raw ?? "").trim();
-      if (s === "") return 0;
-
-      if (/^\d+$/.test(s)) return Math.min(parseInt(s,10), 999999999);
-
-      const normalized = s.replace(/\s/g,"").replace(",",".");
-      const num = Number(normalized);
-      if (!Number.isFinite(num) || num < 0) return 0;
-      return Math.round(num * 100);
-    }
-
-    function formatCentsToInput(cents){
-      const n = (cents || 0) / 100;
+    function formatNumberDE(n){
       return n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
-
-    function readRow(tr){
-      const { inpItem, inpPrice, inpQty } = tr._refs;
-      return {
-        item: inpItem.value ?? "",
-        priceCents: parsePriceToCents(inpPrice.value),
-        qty: clampInt(inpQty.value)
-      };
+    function formatEUR(n){
+      return formatNumberDE(n) + "\u00A0€";
     }
 
-    function hookRowEvents(tr){
-      const { inpItem, inpPrice, inpQty } = tr._refs;
+    // akzeptiert: "4,50" "4.50" "1.234,56" "1234,56"
+    function parsePrice(str){
+      if (!str) return 0;
+      let s = String(str).trim().replace(/\s+/g, "");
+      if (s === "") return 0;
 
-      inpPrice.addEventListener("focus", () => inpPrice.select());
+      // Wenn Komma vorhanden: Punkt als Tausender entfernen, Komma -> Punkt
+      if (s.includes(",")){
+        s = s.replace(/\./g, "");
+        s = s.replace(",", ".");
+      }
 
-      inpPrice.addEventListener("blur", () => {
-        const cents = parsePriceToCents(inpPrice.value);
-        inpPrice.value = formatCentsToInput(cents);
-        updateAll();
-        saveDraft();
-      });
+      // Nur Ziffern und Punkt zulassen
+      s = s.replace(/[^0-9.]/g, "");
 
-      inpPrice.addEventListener("input", () => {
-        updateAll(true);
-        saveDraftThrottled();
-      });
+      // Sicherheit: mehrere Punkte -> nur den ersten als Dezimalpunkt behalten
+      const parts = s.split(".");
+      if (parts.length > 2){
+        s = parts[0] + "." + parts.slice(1).join("");
+      }
 
-      inpQty.addEventListener("input", () => {
-        inpQty.value = clampInt(inpQty.value);
-        updateAll();
-        saveDraftThrottled();
-      });
-
-      inpItem.addEventListener("input", () => saveDraftThrottled());
+      const n = Number(s);
+      return Number.isFinite(n) ? n : 0;
     }
 
-    function makeRow(data = {}){
-      const tr = document.createElement("tr");
-
-      const tdItem = document.createElement("td");
-      const inpItem = document.createElement("input");
-      inpItem.type = "text";
-      inpItem.value = data.item ?? "";
-      tdItem.appendChild(inpItem);
-
-      const tdPrice = document.createElement("td");
-      const inpPrice = document.createElement("input");
-      inpPrice.type = "text";
-      inpPrice.inputMode = "decimal";
-      inpPrice.className = "num";
-      const priceCents = typeof data.priceCents === "number" ? data.priceCents : 0;
-      inpPrice.value = formatCentsToInput(priceCents); // startet als 0,00
-      tdPrice.appendChild(inpPrice);
-
-      const tdQty = document.createElement("td");
-      const inpQty = document.createElement("input");
-      inpQty.type = "number";
-      inpQty.inputMode = "numeric";
-      inpQty.min = "0";
-      inpQty.step = "1";
-      inpQty.className = "num";
-      inpQty.value = (typeof data.qty === "number" ? data.qty : 0);
-      tdQty.appendChild(inpQty);
-
-      const tdSum = document.createElement("td");
-      tdSum.className = "sumcell";
-
-      const sumWrap = document.createElement("div");
-      sumWrap.className = "sumwrap";
-
-      const sumText = document.createElement("div");
-      sumText.className = "sumtext";
-      sumText.textContent = "—";
-
-      const act = document.createElement("div");
-      act.className = "actions";
-
-      const btnInsert = document.createElement("button");
-      btnInsert.type = "button";
-      btnInsert.className = "smallbtn";
-      btnInsert.textContent = "Zeile einfügen";
-      btnInsert.onclick = () => {
-        const newTr = makeRow({ item:"", priceCents:0, qty:0 });
-        tr.parentElement.insertBefore(newTr, tr.nextSibling);
-        hookRowEvents(newTr);
-        updateAll();
-        saveDraft();
-      };
-
-      const btnDup = document.createElement("button");
-      btnDup.type = "button";
-      btnDup.className = "smallbtn";
-      btnDup.textContent = "Duplizieren";
-      btnDup.onclick = () => {
-        const snap = readRow(tr);
-        const newTr = makeRow(snap);
-        tr.parentElement.insertBefore(newTr, tr.nextSibling);
-        hookRowEvents(newTr);
-        updateAll();
-        saveDraft();
-      };
-
-      const btnDel = document.createElement("button");
-      btnDel.type = "button";
-      btnDel.className = "smallbtn";
-      btnDel.textContent = "Löschen";
-      btnDel.onclick = () => {
-        tr.remove();
-        updateAll();
-        saveDraft();
-      };
-
-      act.appendChild(btnInsert);
-      act.appendChild(btnDup);
-      act.appendChild(btnDel);
-
-      sumWrap.appendChild(sumText);
-      sumWrap.appendChild(act);
-      tdSum.appendChild(sumWrap);
-
-      tr.appendChild(tdItem);
-      tr.appendChild(tdPrice);
-      tr.appendChild(tdQty);
-      tr.appendChild(tdSum);
-
-      tr._refs = { inpItem, inpPrice, inpQty, sumText };
-      hookRowEvents(tr);
-
-      return tr;
+    function parseQty(str){
+      const s = String(str ?? "").trim();
+      if (s === "") return 0;
+      const n = parseInt(s, 10);
+      return Number.isFinite(n) && n > 0 ? n : 0;
     }
 
-    function updateAll(){
+    function uid(){
+      return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
+    }
+
+    let state = { rows: [] };
+
+    function makeRow(){
+      return { id: uid(), article: "", priceStr: "", qtyStr: "" };
+    }
+
+    const tbody = document.getElementById("rows");
+    const totalEl = document.getElementById("grandTotal");
+
+    function autosave(){
+      localStorage.setItem(KEY, JSON.stringify({ rows: state.rows, savedAt: Date.now() }));
+    }
+
+    function loadFromStorage(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return false;
+        const obj = JSON.parse(raw);
+        if (!obj || !Array.isArray(obj.rows)) return false;
+        state.rows = obj.rows;
+        return true;
+      } catch { return false; }
+    }
+
+    function updateTotals(){
       let grand = 0;
-      Array.from(tbody.children).forEach(tr => {
-        const { sumText, inpPrice, inpQty } = tr._refs;
 
-        const priceCents = parsePriceToCents(inpPrice.value);
-        const qty = clampInt(inpQty.value);
+      for (const r of state.rows){
+        const price = parsePrice(r.priceStr);
+        const qty = parseQty(r.qtyStr);
+        const sum = price * qty;
 
-        const rowSum = priceCents * qty;
-        if (rowSum === 0){
-          sumText.textContent = "—";
-          sumText.style.color = "#6b7280";
-        } else {
-          sumText.textContent = fmtEUR(rowSum);
-          sumText.style.color = "#111827";
+        const cell = document.getElementById("sum_" + r.id);
+        if (cell){
+          if (sum === 0){
+            cell.textContent = "—";
+            cell.classList.add("mutedCell");
+          } else {
+            cell.textContent = formatEUR(sum);
+            cell.classList.remove("mutedCell");
+          }
         }
-        grand += rowSum;
+        grand += sum;
+      }
+
+      totalEl.textContent = formatEUR(grand);
+    }
+
+    function insertRowAt(index){
+      state.rows.splice(index, 0, makeRow());
+      render(); updateTotals(); autosave();
+    }
+
+    function render(){
+      tbody.innerHTML = "";
+
+      state.rows.forEach((r, idx) => {
+        const tr = document.createElement("tr");
+
+        // Artikel
+        const tdA = document.createElement("td");
+        const inA = document.createElement("input");
+        inA.type = "text";
+        inA.placeholder = "z. B. Rose rot / Dienstleistung / Artikel …";
+        inA.value = r.article;
+        inA.addEventListener("input", () => { r.article = inA.value; autosave(); });
+        tdA.appendChild(inA);
+
+        // Preis
+        const tdP = document.createElement("td");
+        const inP = document.createElement("input");
+        inP.type = "text";
+        inP.inputMode = "decimal";
+        inP.placeholder = "0,00";
+        inP.value = r.priceStr;
+
+        inP.addEventListener("input", () => {
+          r.priceStr = inP.value;
+          updateTotals();
+          autosave();
+        });
+
+        // Optional: beim Verlassen sauber formatieren (ohne €)
+        inP.addEventListener("blur", () => {
+          const raw = String(inP.value).trim();
+          if (raw === "") { r.priceStr = ""; inP.value = ""; updateTotals(); autosave(); return; }
+          const n = parsePrice(raw);
+          // nur formatieren, wenn sinnvoll
+          if (n !== 0 || raw === "0" || raw === "0,0" || raw === "0,00"){
+            const formatted = formatNumberDE(n); // "4,50"
+            r.priceStr = formatted;
+            inP.value = formatted;
+            updateTotals();
+            autosave();
+          }
+        });
+
+        tdP.appendChild(inP);
+
+        // Menge
+        const tdQ = document.createElement("td");
+        const inQ = document.createElement("input");
+        inQ.type = "number";
+        inQ.min = "0";
+        inQ.step = "1";
+        inQ.placeholder = "0";
+        inQ.value = r.qtyStr;
+
+        inQ.addEventListener("input", () => {
+          r.qtyStr = inQ.value;
+          updateTotals();
+          autosave();
+        });
+        tdQ.appendChild(inQ);
+
+        // Summe
+        const tdS = document.createElement("td");
+        tdS.className = "sumCell mutedCell";
+        tdS.id = "sum_" + r.id;
+        tdS.textContent = "—";
+
+        // Actions
+        const tdX = document.createElement("td");
+        tdX.className = "col-actions";
+        const actions = document.createElement("div");
+        actions.className = "rowActions";
+
+        // Zeile einfügen (unterhalb)
+        const btnIns = document.createElement("button");
+        btnIns.className = "mini btn-ghost";
+        btnIns.type = "button";
+        btnIns.title = "Zeile einfügen";
+        btnIns.textContent = "+";
+        btnIns.addEventListener("click", () => insertRowAt(idx + 1));
+
+        // Duplizieren
+        const btnDup = document.createElement("button");
+        btnDup.className = "mini btn-ghost";
+        btnDup.type = "button";
+        btnDup.title = "Zeile duplizieren";
+        btnDup.textContent = "⎘";
+        btnDup.addEventListener("click", () => {
+          const copy = { id: uid(), article: r.article, priceStr: r.priceStr, qtyStr: r.qtyStr };
+          state.rows.splice(idx + 1, 0, copy);
+          render(); updateTotals(); autosave();
+        });
+
+        // Löschen
+        const btnDel = document.createElement("button");
+        btnDel.className = "mini btn-ghost";
+        btnDel.type = "button";
+        btnDel.title = "Zeile löschen";
+        btnDel.textContent = "✕";
+        btnDel.addEventListener("click", () => {
+          state.rows = state.rows.filter(x => x.id !== r.id);
+          if (state.rows.length === 0) state.rows.push(makeRow());
+          render(); updateTotals(); autosave();
+        });
+
+        actions.appendChild(btnIns);
+        actions.appendChild(btnDup);
+        actions.appendChild(btnDel);
+        tdX.appendChild(actions);
+
+        tr.appendChild(tdA);
+        tr.appendChild(tdP);
+        tr.appendChild(tdQ);
+        tr.appendChild(tdS);
+        tr.appendChild(tdX);
+
+        tbody.appendChild(tr);
       });
 
-      grandTotalEl.innerHTML = fmtEUR(grand).replace(" €","&nbsp;€");
+      updateTotals();
     }
 
-    function getSnapshot(){
-      return Array.from(tbody.children).map(readRow);
-    }
-
-    function applySnapshot(rows){
-      tbody.innerHTML = "";
-      const list = Array.isArray(rows) ? rows : [];
-      const toRender = list.length ? list : Array.from({length:DEFAULT_ROWS}, () => ({item:"", priceCents:0, qty:0}));
-      toRender.forEach(r => tbody.appendChild(makeRow(r)));
-      updateAll();
-    }
-
-    function saveDraft(){
-      try{
-        localStorage.setItem(KEY_DRAFT, JSON.stringify({ savedAt: Date.now(), rows: getSnapshot() }));
-      } catch {}
-    }
-
-    let _t = null;
-    function saveDraftThrottled(){
-      clearTimeout(_t);
-      _t = setTimeout(saveDraft, 250);
-    }
-
-    function saveManual(){
-      try{
-        localStorage.setItem(KEY_SAVED, JSON.stringify({ savedAt: Date.now(), rows: getSnapshot() }));
-        alert("Gespeichert (lokal im Browser).");
-      } catch {
-        alert("Konnte nicht speichern (Browser-Speicher blockiert?).");
-      }
-    }
-
-    function restoreManual(){
-      try{
-        const obj = JSON.parse(localStorage.getItem(KEY_SAVED) || "null");
-        if (!obj || !obj.rows) {
-          alert("Noch nichts gespeichert.");
-          return;
-        }
-        applySnapshot(obj.rows);
-        saveDraft();
-      } catch {
-        alert("Konnte nicht wiederherstellen.");
-      }
-    }
-
-    function resetQuantities(){
-      Array.from(tbody.children).forEach(tr => tr._refs.inpQty.value = 0);
-      updateAll();
-      saveDraft();
-    }
-
+    // Buttons oben
     document.getElementById("btnAddRow").addEventListener("click", () => {
-      tbody.appendChild(makeRow({ item:"", priceCents:0, qty:0 }));
-      updateAll();
-      saveDraft();
+      state.rows.push(makeRow());
+      render();
+      autosave();
     });
 
-    document.getElementById("btnResetQty").addEventListener("click", resetQuantities);
-    document.getElementById("btnSave").addEventListener("click", saveManual);
-    document.getElementById("btnRestore").addEventListener("click", restoreManual);
+    document.getElementById("btnSave").addEventListener("click", () => {
+      autosave();
+      // keine nervige Alert-Box – Speichern passiert still
+      // optional: kleiner visueller Hinweis wäre möglich, lassen wir jetzt bewusst weg (stabil/final)
+    });
 
-    (function init(){
-      // Standard-Zeilen
-      for (let i=0;i<DEFAULT_ROWS;i++){
-        tbody.appendChild(makeRow({ item:"", priceCents:0, qty:0 }));
+    document.getElementById("btnRestore").addEventListener("click", () => {
+      const ok = loadFromStorage();
+      if (ok){
+        if (state.rows.length === 0) state.rows.push(makeRow());
+        render();
       }
+    });
 
-      // Draft automatisch wiederherstellen
-      try{
-        const draft = JSON.parse(localStorage.getItem(KEY_DRAFT) || "null");
-        if (draft && draft.rows) applySnapshot(draft.rows);
-        else updateAll();
-      } catch {
-        updateAll();
-      }
+    document.getElementById("btnResetQty").addEventListener("click", () => {
+      // keine Confirm-Box: in der Praxis stört das oft
+      for (const r of state.rows) r.qtyStr = "";
+      render();
+      autosave();
+    });
 
-      saveDraft();
-    })();
+    // Init
+    const ok = loadFromStorage();
+    if (!ok || !Array.isArray(state.rows) || state.rows.length === 0){
+      state.rows = [];
+      for (let i=0; i<DEFAULT_ROWS; i++) state.rows.push(makeRow());
+    }
+    render();
   </script>
 </body>
 </html>
+
+
+
+
+
+   
+
+
+  
+  
+
+ 
+
+   
 
    
 
