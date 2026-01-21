@@ -3,654 +3,694 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Preisrechner (offline)</title>
+  <title>Preisrechner offline</title>
   <style>
     :root{
-      --sage:#7F9C8D;
-      --sage-2:#A9BEB4;
-      --sand:#B08B6A;
-      --sand-2:#D8C3AE;
-      --bg:#F5F6F5;
-      --card:#FFFFFF;
-      --text:#1F2A24;
-      --muted:#5B6B62;
-      --line:rgba(31,42,36,.10);
-      --shadow:0 10px 30px rgba(0,0,0,.06);
-      --radius:16px;
+      --sage: #6f8f7b;
+      --sand: #8a7763;
+      --white: #ffffff;
+      --gray: #f3f4f4;
+      --radius: 12px;
+      --border: 1px solid rgba(138, 119, 99, 0.35);
+      --border-strong: 1px solid rgba(138, 119, 99, 0.7);
+      --pad: 12px;
     }
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
     body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      color:var(--text);
-      background: radial-gradient(1200px 600px at 50% -200px, rgba(127,156,141,.25), transparent 60%),
-                  radial-gradient(900px 500px at 110% 10%, rgba(176,139,106,.18), transparent 55%),
-                  var(--bg);
+      margin: 0;
+      background: var(--gray);
+      color: var(--sand);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
     }
 
     .wrap{
       max-width: 980px;
       margin: 0 auto;
-      padding: 18px 14px 110px;
+      padding: 18px 14px 28px;
+    }
+
+    header{
+      background: var(--white);
+      border: var(--border);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 16px 14px 14px;
     }
 
     h1{
-      margin: 10px 0 14px;
-      text-align:center;
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: .2px;
+      margin: 0;
+      font-size: 20px;
+      font-weight: 650;
+      letter-spacing: 0.2px;
+      color: var(--sand);
     }
 
-    .toolbar{
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
-      padding: 10px 10px;
-      margin: 0 auto 14px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      max-width: 920px;
+    .sub{
+      margin: 6px 0 0;
+      font-size: 12px;
+      color: rgba(138, 119, 99, 0.85);
+    }
+
+    .panel{
+      margin-top: 12px;
+      background: var(--white);
+      border: var(--border);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 12px 12px 10px;
+    }
+
+    .topbar{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: stretch;
     }
 
     .btn{
-      appearance:none;
-      border:1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.90));
-      color: var(--text);
-      padding: 10px 12px;
-      border-radius: 999px;
+      flex: 1 1 160px;
+      height: 42px;
+      border-radius: var(--radius);
+      border: var(--border-strong);
+      background: var(--gray);
+      color: var(--sand);
       font-size: 14px;
-      line-height: 1;
-      cursor:pointer;
-      user-select:none;
-      transition: transform .04s ease, background .2s ease, border-color .2s ease;
-      white-space:nowrap;
+      font-weight: 600;
+      letter-spacing: 0.15px;
+      padding: 0 10px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
-    .btn:active{ transform: translateY(1px); }
-    .btn:focus{ outline:2px solid rgba(127,156,141,.35); outline-offset:2px; }
+
+    .btn:active{ transform: translateY(0.5px); }
+    .btn:focus{ outline: none; border: var(--border-strong); }
 
     .btn.primary{
-      border-color: rgba(127,156,141,.35);
-      background: linear-gradient(180deg, rgba(127,156,141,.18), rgba(127,156,141,.08));
-    }
-    .btn.sand{
-      border-color: rgba(176,139,106,.35);
-      background: linear-gradient(180deg, rgba(176,139,106,.16), rgba(176,139,106,.07));
+      background: var(--sage);
+      border: 1px solid rgba(111, 143, 123, 0.75);
+      color: var(--white);
     }
 
-    .card{
-      background: var(--card);
-      border:1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
+    .btn.secondary{
+      background: var(--sand);
+      border: 1px solid rgba(138, 119, 99, 0.75);
+      color: var(--white);
     }
 
-    .table-wrap{
-      overflow-x:auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      min-width: 760px;
-    }
-
-    thead th{
-      position: sticky;
-      top: 0;
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      z-index: 2;
+    .status{
+      margin-top: 10px;
       font-size: 12px;
-      text-transform: none;
-      letter-spacing: .2px;
-      color: var(--muted);
-      padding: 12px 10px;
-      border-bottom: 1px solid var(--line);
-      font-weight: 700;
+      color: rgba(138, 119, 99, 0.85);
+      min-height: 16px;
     }
 
-    tbody td{
-      padding: 10px;
-      border-bottom: 1px solid rgba(31,42,36,.06);
-      vertical-align: middle;
-      background: rgba(255,255,255,.98);
+    .sheet{
+      margin-top: 12px;
+      border-radius: calc(var(--radius) + 4px);
+      border: var(--border);
+      overflow: hidden;
+      background: var(--white);
     }
 
-    tbody tr:last-child td{ border-bottom:none; }
-
-    .col-item{ width: 46%; }
-    .col-price{ width: 16%; }
-    .col-qty{ width: 12%; }
-    .col-sum{ width: 16%; }
-    .col-actions{ width: 10%; }
-
-    .field{
-      width:100%;
-      border:1px solid rgba(31,42,36,.10);
-      background: rgba(245,246,245,.65);
-      border-radius: 12px;
+    .headrow, .row{
+      display: grid;
+      grid-template-columns: minmax(180px, 2.2fr) minmax(110px, 1fr) minmax(90px, 0.8fr) minmax(120px, 1fr) 44px;
+      gap: 10px;
+      align-items: center;
       padding: 10px 10px;
+    }
+
+    .headrow{
+      background: var(--gray);
+      border-bottom: var(--border);
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(138, 119, 99, 0.9);
+    }
+
+    .row{
+      border-bottom: 1px solid rgba(138, 119, 99, 0.22);
+      background: var(--white);
+    }
+    .row:last-child{ border-bottom: none; }
+
+    .cell{
+      min-width: 0;
+    }
+
+    input[type="text"], input[type="number"]{
+      width: 100%;
+      height: 40px;
+      border-radius: var(--radius);
+      border: var(--border);
+      background: var(--white);
+      color: var(--sand);
       font-size: 14px;
-      color: var(--text);
-      outline:none;
-      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+      padding: 0 10px;
+      outline: none;
     }
-    .field:focus{
-      border-color: rgba(127,156,141,.55);
-      box-shadow: 0 0 0 3px rgba(127,156,141,.18);
-      background: rgba(255,255,255,.92);
+    input[type="text"]:focus, input[type="number"]:focus{
+      border: 1px solid rgba(111, 143, 123, 0.85);
     }
 
-    .field.price{
-      text-align:right;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .field.qty{
-      text-align:right;
-      font-variant-numeric: tabular-nums;
-      padding-right: 8px;
-    }
-
-    /* keep native spinner arrows visible */
     input[type="number"]{
-      -moz-appearance: auto;
-      appearance: auto;
+      padding-right: 6px;
     }
 
     .sum{
-      display:block;
-      width:100%;
-      border:1px solid rgba(31,42,36,.08);
-      background: rgba(127,156,141,.10);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 10px 10px;
-      text-align:right;
-      font-size: 14px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 10px;
+      border-radius: var(--radius);
+      border: var(--border);
+      background: var(--gray);
+      color: var(--sand);
       font-variant-numeric: tabular-nums;
-      user-select:text;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .actions{
-      display:flex;
-      justify-content:flex-end;
-      gap:6px;
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+      align-items: center;
     }
 
-    .icon-btn{
-      width: 30px;
-      height: 30px;
-      border-radius: 10px;
-      border: 1px solid rgba(31,42,36,.10);
-      background: rgba(245,246,245,.72);
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:0;
-      transition: background .2s ease, border-color .2s ease, transform .04s ease;
-      color: var(--muted);
+    .iconbtn{
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      border: var(--border);
+      background: var(--white);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      color: rgba(138, 119, 99, 0.9);
+      -webkit-tap-highlight-color: transparent;
     }
-    .icon-btn:active{ transform: translateY(1px); }
-    .icon-btn:focus{ outline:2px solid rgba(127,156,141,.35); outline-offset:2px; }
-    .icon-btn:hover{
-      background: rgba(245,246,245,.92);
-      border-color: rgba(127,156,141,.25);
-      color: var(--text);
+    .iconbtn:focus{ outline: none; border: 1px solid rgba(111, 143, 123, 0.85); }
+    .iconbtn:active{ transform: translateY(0.5px); }
+
+    .iconbtn svg{
+      width: 12px;
+      height: 12px;
+      display: block;
+      fill: currentColor;
     }
 
-    .footer-total{
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 12px 14px 16px;
-      background: linear-gradient(180deg, rgba(245,246,245,0), rgba(245,246,245,.86) 30%, rgba(245,246,245,.96));
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      z-index: 10;
-    }
-
-    .total-card{
-      max-width: 980px;
-      margin: 0 auto;
-      background: var(--card);
-      border:1px solid var(--line);
-      border-radius: calc(var(--radius) + 2px);
-      box-shadow: var(--shadow);
-      padding: 14px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+    .footer{
+      margin-top: 12px;
+      background: var(--white);
+      border: var(--border);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 12px;
     }
 
     .total-label{
-      font-size: 13px;
-      color: var(--muted);
+      font-size: 14px;
       font-weight: 700;
-      letter-spacing: .2px;
+      color: rgba(138, 119, 99, 0.92);
+      white-space: nowrap;
     }
 
     .total-value{
-      font-size: 22px;
-      font-weight: 800;
+      font-size: 18px;
+      font-weight: 750;
+      color: var(--sand);
       font-variant-numeric: tabular-nums;
-      color: var(--text);
+      white-space: nowrap;
     }
 
-    .subtle-badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .dot{
-      width:10px;height:10px;border-radius:50%;
-      background: rgba(127,156,141,.55);
-      box-shadow: 0 0 0 3px rgba(127,156,141,.12);
-      flex: 0 0 auto;
+    .empty{
+      padding: 14px 12px;
+      border-top: var(--border);
+      background: var(--white);
+      font-size: 13px;
+      color: rgba(138, 119, 99, 0.85);
     }
 
     @media (max-width: 520px){
-      h1{ font-size: 20px; }
-      .btn{ font-size: 13px; padding: 10px 11px; }
-      .total-value{ font-size: 20px; }
+      .wrap{ padding: 14px 12px 22px; }
+      header{ padding: 14px 12px 12px; }
+      h1{ font-size: 18px; }
+      .btn{ flex: 1 1 calc(50% - 10px); }
+      .headrow, .row{
+        grid-template-columns: minmax(160px, 2.2fr) minmax(98px, 1fr) minmax(86px, 0.8fr) minmax(110px, 1fr) 44px;
+        gap: 8px;
+        padding: 10px 10px;
+      }
+      input[type="text"], input[type="number"], .sum{ height: 38px; font-size: 14px; }
+      .sum{ padding: 0 9px; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Preisrechner (offline)</h1>
+    <header>
+      <h1>Preisrechner offline</h1>
+      <p class="sub">Artikel / Produkt / Leistung, Einzelpreis und Menge eingeben – Summen werden automatisch berechnet. Speicherung lokal im Browser (keine Cloud).</p>
+    </header>
 
-    <div class="toolbar" role="toolbar" aria-label="Aktionen">
-      <button class="btn primary" id="addRowBtn" type="button">Artikel hinzufügen</button>
-      <button class="btn sand" id="saveBtn" type="button">Speichern</button>
-      <button class="btn sand" id="restoreBtn" type="button">Wiederherstellen</button>
-      <button class="btn" id="resetQtyBtn" type="button">Mengen zurücksetzen</button>
-    </div>
-
-    <div class="card">
-      <div class="table-wrap">
-        <table aria-label="Preisrechner Tabelle">
-          <thead>
-            <tr>
-              <th class="col-item">Artikel / Produkt / Leistung</th>
-              <th class="col-price">Einzelpreis (€)</th>
-              <th class="col-qty">Menge</th>
-              <th class="col-sum">Summe</th>
-              <th class="col-actions"></th>
-            </tr>
-          </thead>
-          <tbody id="rows"></tbody>
-        </table>
+    <section class="panel" aria-label="Aktionen">
+      <div class="topbar">
+        <button class="btn primary" id="addRowBtn" type="button">Artikel hinzufügen</button>
+        <button class="btn secondary" id="saveBtn" type="button">Speichern</button>
+        <button class="btn" id="restoreBtn" type="button">Wiederherstellen</button>
+        <button class="btn" id="resetQtyBtn" type="button">Mengen zurücksetzen</button>
       </div>
-    </div>
-  </div>
+      <div class="status" id="status" aria-live="polite"></div>
+    </section>
 
-  <div class="footer-total" aria-live="polite">
-    <div class="total-card">
-      <div>
-        <div class="total-label">Gesamtsumme</div>
-        <div class="subtle-badge"><span class="dot" aria-hidden="true"></span><span>0,00&nbsp;€</span></div>
+    <section class="sheet" aria-label="Preisrechner">
+      <div class="headrow" role="row">
+        <div class="cell" role="columnheader">Artikel / Produkt / Leistung</div>
+        <div class="cell" role="columnheader">Einzelpreis (€)</div>
+        <div class="cell" role="columnheader">Menge</div>
+        <div class="cell" role="columnheader" style="text-align:right;">Summe</div>
+        <div class="cell" role="columnheader" style="text-align:right;">&nbsp;</div>
       </div>
+      <div id="rows"></div>
+      <div id="emptyState" class="empty" hidden>Keine Zeilen vorhanden.</div>
+    </section>
+
+    <section class="footer" aria-label="Gesamtsumme">
+      <div class="total-label">Gesamtsumme</div>
       <div class="total-value" id="grandTotal">0,00&nbsp;€</div>
-    </div>
+    </section>
   </div>
 
   <script>
-    "use strict";
+    (function(){
+      const STORAGE_KEY = "preisrechner_offline_state_v1";
 
-    // --------- Konstanten ---------
-    const START_ROWS = 12;
-    const STORAGE_KEY = "preisrechner_offline_v1";
+      const rowsEl = document.getElementById("rows");
+      const emptyEl = document.getElementById("emptyState");
+      const grandTotalEl = document.getElementById("grandTotal");
+      const statusEl = document.getElementById("status");
 
-    // --------- Utilities ---------
-    function formatEuroFromCents(cents) {
-      const value = (cents || 0) / 100;
-      return value.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "\u00A0€";
-    }
+      const addRowBtn = document.getElementById("addRowBtn");
+      const saveBtn = document.getElementById("saveBtn");
+      const restoreBtn = document.getElementById("restoreBtn");
+      const resetQtyBtn = document.getElementById("resetQtyBtn");
 
-    function formatDeNumberFromCents(cents) {
-      const value = (cents || 0) / 100;
-      return value.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
+      const nf = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // Nur Ziffern annehmen, als Cent-Integer interpretieren (letzte 2 Stellen = Nachkommastellen).
-    function centsFromInputString(raw) {
-      const digits = String(raw || "").replace(/\D/g, "");
-      if (!digits) return 0;
-      // Sehr große Zahlen stabil begrenzen (praktisch, ohne UI-Extra)
-      const safe = digits.length > 12 ? digits.slice(0, 12) : digits;
-      return parseInt(safe, 10) || 0;
-    }
-
-    function clampInt(n, min, max) {
-      if (!Number.isFinite(n)) return min;
-      return Math.min(max, Math.max(min, Math.trunc(n)));
-    }
-
-    // --------- DOM / State ---------
-    const tbody = document.getElementById("rows");
-    const grandTotalEl = document.getElementById("grandTotal");
-
-    function createIconButton(label, glyph) {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "icon-btn";
-      btn.setAttribute("aria-label", label);
-      btn.title = label;
-      btn.textContent = glyph;
-      return btn;
-    }
-
-    function createRow(data = {}) {
-      const tr = document.createElement("tr");
-
-      // Artikel
-      const tdItem = document.createElement("td");
-      tdItem.className = "col-item";
-      const itemInput = document.createElement("input");
-      itemInput.type = "text";
-      itemInput.className = "field";
-      itemInput.value = data.item || "";
-      itemInput.autocomplete = "off";
-      itemInput.spellcheck = false;
-      tdItem.appendChild(itemInput);
-
-      // Einzelpreis
-      const tdPrice = document.createElement("td");
-      tdPrice.className = "col-price";
-      const priceInput = document.createElement("input");
-      priceInput.type = "text";
-      priceInput.className = "field price";
-      priceInput.inputMode = "numeric";
-      priceInput.autocomplete = "off";
-      priceInput.spellcheck = false;
-      priceInput.value = formatDeNumberFromCents(data.priceCents || 0);
-      priceInput.dataset.cents = String(data.priceCents || 0);
-      tdPrice.appendChild(priceInput);
-
-      // Menge
-      const tdQty = document.createElement("td");
-      tdQty.className = "col-qty";
-      const qtyInput = document.createElement("input");
-      qtyInput.type = "number";
-      qtyInput.className = "field qty";
-      qtyInput.min = "0";
-      qtyInput.step = "1";
-      qtyInput.value = String(Number.isFinite(data.qty) ? clampInt(data.qty, 0, 999999) : 0);
-      tdQty.appendChild(qtyInput);
-
-      // Summe
-      const tdSum = document.createElement("td");
-      tdSum.className = "col-sum";
-      const sumBox = document.createElement("span");
-      sumBox.className = "sum";
-      sumBox.textContent = formatEuroFromCents(0);
-      tdSum.appendChild(sumBox);
-
-      // Actions
-      const tdAct = document.createElement("td");
-      tdAct.className = "col-actions";
-      const actWrap = document.createElement("div");
-      actWrap.className = "actions";
-
-      const dupBtn = createIconButton("Duplizieren", "⎘");
-      const insBtn = createIconButton("Zeile einfügen", "＋");
-      const delBtn = createIconButton("Zeile löschen", "−");
-
-      actWrap.appendChild(dupBtn);
-      actWrap.appendChild(insBtn);
-      actWrap.appendChild(delBtn);
-      tdAct.appendChild(actWrap);
-
-      tr.appendChild(tdItem);
-      tr.appendChild(tdPrice);
-      tr.appendChild(tdQty);
-      tr.appendChild(tdSum);
-      tr.appendChild(tdAct);
-
-      // ---- Events ----
-
-      // Preis: nur Ziffern akzeptieren; Anzeige immer als 0,00 im de-DE Format.
-      function syncPriceFromField() {
-        const cents = centsFromInputString(priceInput.value);
-        priceInput.dataset.cents = String(cents);
-        priceInput.value = formatDeNumberFromCents(cents);
-        recalcRow(tr);
-        recalcGrandTotal();
+      function nowText(){
+        const d = new Date();
+        const hh = String(d.getHours()).padStart(2, "0");
+        const mm = String(d.getMinutes()).padStart(2, "0");
+        const ss = String(d.getSeconds()).padStart(2, "0");
+        return `${hh}:${mm}:${ss}`;
       }
 
-      priceInput.addEventListener("input", () => {
-        // Während Eingabe: schon stabilisieren (keine Komma/Punkt-Probleme)
-        const cents = centsFromInputString(priceInput.value);
-        priceInput.dataset.cents = String(cents);
-        // Keine Formatierung mitten im Tippen erzwingen? -> Doch, um Rechenfehler zu vermeiden.
-        priceInput.value = formatDeNumberFromCents(cents);
-        recalcRow(tr);
-        recalcGrandTotal();
-      });
+      let statusTimer = null;
+      function setStatus(text){
+        statusEl.textContent = text || "";
+        if(statusTimer) clearTimeout(statusTimer);
+        if(text){
+          statusTimer = setTimeout(() => { statusEl.textContent = ""; }, 2500);
+        }
+      }
 
-      priceInput.addEventListener("blur", syncPriceFromField);
+      function formatMoneyValue(valueNumber){
+        const v = Number.isFinite(valueNumber) ? valueNumber : 0;
+        return nf.format(v);
+      }
 
-      // Menge: ganze Zahl, leere Felder = 0
-      qtyInput.addEventListener("input", () => {
-        const raw = qtyInput.value;
-        const qty = raw === "" ? 0 : clampInt(Number(raw), 0, 999999);
-        if (raw !== "" && String(qty) !== raw) qtyInput.value = String(qty);
-        recalcRow(tr);
-        recalcGrandTotal();
-      });
+      function moneyToCentsFromInput(raw){
+        const s0 = String(raw ?? "").trim();
+        if(!s0) return 0;
 
-      itemInput.addEventListener("input", () => {
-        // Keine Rechenlogik nötig, aber Zustand konsistent halten (ohne Extras)
-      });
+        let s = s0.replace(/\s+/g, "");
+        s = s.replace(/-/g, "");
+        s = s.replace(/[^\d.,]/g, "");
 
-      // Duplizieren (Artikel + Preis, Menge optional -> hier: Menge wird mitkopiert)
-      dupBtn.addEventListener("click", () => {
-        const cloned = getRowData(tr);
-        const newTr = createRow(cloned);
-        tr.insertAdjacentElement("afterend", newTr);
-        recalcRow(newTr);
-        recalcGrandTotal();
-      });
+        if(!s) return 0;
 
-      // Zeile einfügen (darunter, leer)
-      insBtn.addEventListener("click", () => {
-        const newTr = createRow();
-        tr.insertAdjacentElement("afterend", newTr);
-        recalcRow(newTr);
-        recalcGrandTotal();
-      });
+        const hasComma = s.includes(",");
+        const hasDot = s.includes(".");
+        let normalized = s;
 
-      // Zeile löschen
-      delBtn.addEventListener("click", () => {
-        if (tbody.children.length <= 1) {
-          // Mindestens eine Zeile behalten: stattdessen leeren
-          itemInput.value = "";
-          priceInput.dataset.cents = "0";
-          priceInput.value = formatDeNumberFromCents(0);
-          qtyInput.value = "0";
-          recalcRow(tr);
-          recalcGrandTotal();
+        if(hasComma){
+          const parts = normalized.split(",");
+          const dec = parts.pop() ?? "";
+          const intPart = parts.join("").replace(/\./g, "");
+          normalized = intPart + "." + dec;
+        } else if(hasDot){
+          const parts = normalized.split(".");
+          const dec = parts.pop() ?? "";
+          const intPart = parts.join("");
+          normalized = intPart + "." + dec;
+        } else {
+          normalized = normalized;
+        }
+
+        let num = Number(normalized);
+        if(!Number.isFinite(num) || num < 0) num = 0;
+
+        const cents = Math.round(num * 100);
+        return cents < 0 ? 0 : cents;
+      }
+
+      function centsToMoney(cents){
+        const c = Number.isFinite(cents) ? Math.max(0, Math.round(cents)) : 0;
+        return c / 100;
+      }
+
+      function clampInt(v){
+        const n = Number(v);
+        if(!Number.isFinite(n)) return 0;
+        const i = Math.trunc(n);
+        return i < 0 ? 0 : i;
+      }
+
+      function computeRowCents(row){
+        const cents = moneyToCentsFromInput(row.priceText);
+        const qty = clampInt(row.qty);
+        return cents * qty;
+      }
+
+      function computeGrandTotalCents(state){
+        return state.rows.reduce((sum, r) => sum + computeRowCents(r), 0);
+      }
+
+      function defaultRow(){
+        return { item: "", priceText: "0,00", qty: 0 };
+      }
+
+      let state = { rows: [defaultRow()] };
+
+      function render(){
+        rowsEl.innerHTML = "";
+        const hasRows = state.rows.length > 0;
+        emptyEl.hidden = hasRows;
+
+        state.rows.forEach((row, idx) => {
+          const rowEl = document.createElement("div");
+          rowEl.className = "row";
+          rowEl.dataset.index = String(idx);
+
+          const itemCell = document.createElement("div");
+          itemCell.className = "cell";
+          const itemInput = document.createElement("input");
+          itemInput.type = "text";
+          itemInput.value = row.item ?? "";
+          itemInput.setAttribute("aria-label", "Artikel / Produkt / Leistung");
+          itemInput.addEventListener("input", () => {
+            state.rows[idx].item = itemInput.value;
+            scheduleAutoSave();
+          });
+          itemCell.appendChild(itemInput);
+
+          const priceCell = document.createElement("div");
+          priceCell.className = "cell";
+          const priceInput = document.createElement("input");
+          priceInput.type = "text";
+          priceInput.inputMode = "decimal";
+          priceInput.autocomplete = "off";
+          priceInput.spellcheck = false;
+          priceInput.value = (row.priceText == null || row.priceText === "") ? "0,00" : String(row.priceText);
+          priceInput.setAttribute("aria-label", "Einzelpreis in Euro");
+          priceInput.addEventListener("focus", () => {
+            try{ priceInput.select(); } catch(_){}
+          });
+          priceInput.addEventListener("input", () => {
+            let v = priceInput.value;
+            v = v.replace(/-/g, "");
+            state.rows[idx].priceText = v;
+            updateRowSum(idx, rowEl);
+            updateGrandTotal();
+            scheduleAutoSave();
+          });
+          priceInput.addEventListener("blur", () => {
+            const cents = moneyToCentsFromInput(priceInput.value);
+            const formatted = formatMoneyValue(centsToMoney(cents));
+            priceInput.value = formatted;
+            state.rows[idx].priceText = formatted;
+            updateRowSum(idx, rowEl);
+            updateGrandTotal();
+            scheduleAutoSave();
+          });
+          priceCell.appendChild(priceInput);
+
+          const qtyCell = document.createElement("div");
+          qtyCell.className = "cell";
+          const qtyInput = document.createElement("input");
+          qtyInput.type = "number";
+          qtyInput.min = "0";
+          qtyInput.step = "1";
+          qtyInput.value = String(clampInt(row.qty));
+          qtyInput.setAttribute("aria-label", "Menge");
+          qtyInput.addEventListener("input", () => {
+            const q = clampInt(qtyInput.value);
+            qtyInput.value = String(q);
+            state.rows[idx].qty = q;
+            updateRowSum(idx, rowEl);
+            updateGrandTotal();
+            scheduleAutoSave();
+          });
+          qtyCell.appendChild(qtyInput);
+
+          const sumCell = document.createElement("div");
+          sumCell.className = "cell";
+          const sumBox = document.createElement("div");
+          sumBox.className = "sum";
+          sumBox.setAttribute("aria-label", "Summe der Zeile");
+          sumBox.style.textAlign = "right";
+          sumBox.dataset.role = "rowsum";
+          sumBox.textContent = formatMoneyValue(centsToMoney(computeRowCents(row))) + "\u00A0€";
+          sumCell.appendChild(sumBox);
+
+          const actionsCell = document.createElement("div");
+          actionsCell.className = "cell";
+          const actions = document.createElement("div");
+          actions.className = "actions";
+
+          const dupBtn = iconButton("Duplizieren", svgDuplicate());
+          dupBtn.addEventListener("click", () => {
+            const copy = {
+              item: state.rows[idx].item ?? "",
+              priceText: (state.rows[idx].priceText == null || state.rows[idx].priceText === "") ? "0,00" : String(state.rows[idx].priceText),
+              qty: clampInt(state.rows[idx].qty)
+            };
+            state.rows.splice(idx + 1, 0, copy);
+            render();
+            updateGrandTotal();
+            saveAuto();
+            setStatus("Dupliziert (" + nowText() + ")");
+          });
+
+          const insBtn = iconButton("Zeile einfügen (darunter)", svgInsertBelow());
+          insBtn.addEventListener("click", () => {
+            state.rows.splice(idx + 1, 0, defaultRow());
+            render();
+            updateGrandTotal();
+            saveAuto();
+            setStatus("Eingefügt (" + nowText() + ")");
+          });
+
+          const delBtn = iconButton("Löschen", svgTrash());
+          delBtn.addEventListener("click", () => {
+            state.rows.splice(idx, 1);
+            render();
+            updateGrandTotal();
+            saveAuto();
+            setStatus("Gelöscht (" + nowText() + ")");
+          });
+
+          actions.appendChild(dupBtn);
+          actions.appendChild(insBtn);
+          actions.appendChild(delBtn);
+          actionsCell.appendChild(actions);
+
+          rowEl.appendChild(itemCell);
+          rowEl.appendChild(priceCell);
+          rowEl.appendChild(qtyCell);
+          rowEl.appendChild(sumCell);
+          rowEl.appendChild(actionsCell);
+
+          rowsEl.appendChild(rowEl);
+        });
+
+        updateGrandTotal();
+      }
+
+      function iconButton(title, svgEl){
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "iconbtn";
+        b.title = title;
+        b.setAttribute("aria-label", title);
+        b.appendChild(svgEl);
+        return b;
+      }
+
+      function svgDuplicate(){
+        const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        s.setAttribute("viewBox", "0 0 24 24");
+        const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        p.setAttribute("d","M8 8h10v10H8V8zm-2 2H5V5h10v1H6v4zm0 0v9h9v-1H7v-8H6z");
+        s.appendChild(p);
+        return s;
+      }
+
+      function svgInsertBelow(){
+        const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        s.setAttribute("viewBox", "0 0 24 24");
+        const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        p.setAttribute("d","M4 6h16v2H4V6zm8 4v4h4v2h-4v4h-2v-4H6v-2h4v-4h2z");
+        s.appendChild(p);
+        return s;
+      }
+
+      function svgTrash(){
+        const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        s.setAttribute("viewBox", "0 0 24 24");
+        const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        p.setAttribute("d","M9 3h6l1 2h5v2H3V5h5l1-2zm1 6h2v10h-2V9zm4 0h2v10h-2V9zM7 9h2v10H7V9z");
+        s.appendChild(p);
+        return s;
+      }
+
+      function updateRowSum(idx, rowEl){
+        const sumBox = rowEl.querySelector('[data-role="rowsum"]');
+        if(!sumBox) return;
+        const row = state.rows[idx];
+        const cents = computeRowCents(row);
+        sumBox.textContent = formatMoneyValue(centsToMoney(cents)) + "\u00A0€";
+      }
+
+      function updateGrandTotal(){
+        const totalCents = computeGrandTotalCents(state);
+        grandTotalEl.textContent = formatMoneyValue(centsToMoney(totalCents)) + "\u00A0€";
+      }
+
+      function serializeState(){
+        const rows = (state.rows || []).map(r => ({
+          item: String(r.item ?? ""),
+          priceText: (r.priceText == null || r.priceText === "") ? "0,00" : String(r.priceText),
+          qty: clampInt(r.qty)
+        }));
+        return { rows };
+      }
+
+      function applyState(obj){
+        const rows = Array.isArray(obj?.rows) ? obj.rows : [];
+        state.rows = rows.map(r => ({
+          item: String(r?.item ?? ""),
+          priceText: (r?.priceText == null || r?.priceText === "") ? "0,00" : String(r.priceText),
+          qty: clampInt(r?.qty)
+        }));
+        render();
+      }
+
+      function saveManual(){
+        const payload = serializeState();
+        try{
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+          setStatus("Gespeichert (" + nowText() + ")");
+        }catch(_){
+          setStatus("Speichern nicht möglich (" + nowText() + ")");
+        }
+      }
+
+      function restore(){
+        let raw = null;
+        try{
+          raw = localStorage.getItem(STORAGE_KEY);
+        }catch(_){
+          setStatus("Wiederherstellen nicht möglich (" + nowText() + ")");
           return;
         }
-        tr.remove();
-        recalcGrandTotal();
-      });
-
-      // Initiale Berechnung
-      recalcRow(tr);
-
-      return tr;
-    }
-
-    function getRowData(tr) {
-      const item = tr.querySelector("input[type='text']").value || "";
-      const priceInput = tr.querySelector("input.field.price");
-      const qtyInput = tr.querySelector("input.field.qty");
-      const priceCents = parseInt(priceInput.dataset.cents || "0", 10) || 0;
-      const qty = qtyInput.value === "" ? 0 : clampInt(Number(qtyInput.value), 0, 999999);
-      return { item, priceCents, qty };
-    }
-
-    function recalcRow(tr) {
-      const priceInput = tr.querySelector("input.field.price");
-      const qtyInput = tr.querySelector("input.field.qty");
-      const sumBox = tr.querySelector(".sum");
-
-      const priceCents = parseInt(priceInput.dataset.cents || "0", 10) || 0;
-      const qty = qtyInput.value === "" ? 0 : clampInt(Number(qtyInput.value), 0, 999999);
-
-      // Exakte Cent-Rechnung (keine Rundungsfehler)
-      const rowCents = priceCents * qty;
-
-      sumBox.textContent = formatEuroFromCents(rowCents);
-      sumBox.dataset.cents = String(rowCents);
-    }
-
-    function recalcGrandTotal() {
-      let totalCents = 0;
-      const rows = tbody.querySelectorAll("tr");
-      for (const tr of rows) {
-        const sumBox = tr.querySelector(".sum");
-        const cents = parseInt(sumBox.dataset.cents || "0", 10) || 0;
-        totalCents += cents;
-      }
-      grandTotalEl.textContent = formatEuroFromCents(totalCents);
-
-      // Update subtile Anzeige links im Total-Card (ohne Extra-Text)
-      const subtle = document.querySelector(".subtle-badge span:last-child");
-      if (subtle) subtle.textContent = formatEuroFromCents(totalCents);
-    }
-
-    function addEmptyRow() {
-      const tr = createRow();
-      tbody.appendChild(tr);
-      recalcRow(tr);
-      recalcGrandTotal();
-    }
-
-    function setRowsFromData(list) {
-      tbody.innerHTML = "";
-      const arr = Array.isArray(list) ? list : [];
-      if (arr.length === 0) {
-        for (let i = 0; i < START_ROWS; i++) tbody.appendChild(createRow());
-      } else {
-        for (const row of arr) {
-          tbody.appendChild(createRow({
-            item: typeof row.item === "string" ? row.item : "",
-            priceCents: Number.isFinite(row.priceCents) ? clampInt(row.priceCents, 0, 999999999999) : 0,
-            qty: Number.isFinite(row.qty) ? clampInt(row.qty, 0, 999999) : 0
-          }));
+        if(!raw){
+          setStatus("Kein gespeicherter Zustand (" + nowText() + ")");
+          return;
+        }
+        try{
+          const obj = JSON.parse(raw);
+          applyState(obj);
+          setStatus("Wiederhergestellt (" + nowText() + ")");
+        }catch(_){
+          setStatus("Gespeicherter Zustand ungültig (" + nowText() + ")");
         }
       }
-      // Nach dem Aufbau alles neu berechnen
-      const rows = tbody.querySelectorAll("tr");
-      for (const tr of rows) recalcRow(tr);
-      recalcGrandTotal();
-    }
 
-    function getAllData() {
-      const rows = [];
-      for (const tr of tbody.querySelectorAll("tr")) rows.push(getRowData(tr));
-      return rows;
-    }
-
-    // --------- Globale Buttons ---------
-    document.getElementById("addRowBtn").addEventListener("click", () => {
-      addEmptyRow();
-    });
-
-    document.getElementById("saveBtn").addEventListener("click", () => {
-      const data = getAllData();
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ rows: data }));
-      } catch (e) {
-        // Offline-Tool: still bleiben (keine Popups)
+      function resetQuantities(){
+        state.rows = (state.rows || []).map(r => ({
+          item: String(r.item ?? ""),
+          priceText: (r.priceText == null || r.priceText === "") ? "0,00" : String(r.priceText),
+          qty: 0
+        }));
+        render();
+        saveAuto();
+        setStatus("Mengen zurückgesetzt (" + nowText() + ")");
       }
-    });
 
-    document.getElementById("restoreBtn").addEventListener("click", () => {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        const parsed = JSON.parse(raw);
-        setRowsFromData(parsed && parsed.rows);
-      } catch (e) {
-        // Still bleiben (keine Popups)
+      function addRow(){
+        state.rows.push(defaultRow());
+        render();
+        saveAuto();
+        setStatus("Zeile hinzugefügt (" + nowText() + ")");
       }
-    });
 
-    document.getElementById("resetQtyBtn").addEventListener("click", () => {
-      for (const tr of tbody.querySelectorAll("tr")) {
-        const qtyInput = tr.querySelector("input.field.qty");
-        qtyInput.value = "0";
-        recalcRow(tr);
+      let saveTimer = null;
+      function scheduleAutoSave(){
+        if(saveTimer) clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          saveAuto();
+        }, 300);
       }
-      recalcGrandTotal();
-    });
 
-    // --------- Startzustand ---------
-    (function init() {
-      // Immer 12 sichtbare Zeilen beim Start
-      for (let i = 0; i < START_ROWS; i++) tbody.appendChild(createRow());
-      recalcGrandTotal();
+      function saveAuto(){
+        const payload = serializeState();
+        try{
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        }catch(_){}
+      }
+
+      addRowBtn.addEventListener("click", addRow);
+      saveBtn.addEventListener("click", saveManual);
+      restoreBtn.addEventListener("click", restore);
+      resetQtyBtn.addEventListener("click", resetQuantities);
+
+      (function init(){
+        let loaded = false;
+        try{
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if(raw){
+            const obj = JSON.parse(raw);
+            applyState(obj);
+            loaded = true;
+          }
+        }catch(_){}
+        if(!loaded) render();
+        updateGrandTotal();
+      })();
     })();
   </script>
 </body>
 </html>
 
-
-    
-  
-
-   
  
-    
-     
-
-    
-   
- 
-    
-   
-   
- 
-  
-  
-
-    
-   
 
 
-
-
- >
- 
- 
-   
 
 
   
+
   
 
- 
 
    
 
