@@ -100,6 +100,34 @@
       color: var(--white);
     }
 
+    /* Neue, ruhige Anzeige der Gesamtsumme im oberen Bereich */
+    .top-total{
+      margin-top: 10px;
+      border: var(--border);
+      border-radius: calc(var(--radius) + 4px);
+      background: var(--gray);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .top-total .label{
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(167, 147, 128, 0.92);
+      white-space: nowrap;
+    }
+
+    .top-total .value{
+      font-size: 18px;
+      font-weight: 750;
+      color: var(--sand);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
     .status{
       margin-top: 10px;
       font-size: 12px;
@@ -254,6 +282,8 @@
       }
       input[type="text"], input[type="number"], .sum{ height: 38px; font-size: 14px; }
       .sum{ padding: 0 9px; }
+      .top-total{ padding: 10px 12px; }
+      .top-total .value{ font-size: 18px; }
     }
   </style>
 </head>
@@ -271,6 +301,12 @@
         <button class="btn" id="restoreBtn" type="button">Wiederherstellen</button>
         <button class="btn" id="resetQtyBtn" type="button">Mengen zurücksetzen</button>
       </div>
+
+      <div class="top-total" aria-label="Gesamtsumme (oben)">
+        <div class="label">Gesamtsumme</div>
+        <div class="value" id="grandTotalTop">0,00&nbsp;€</div>
+      </div>
+
       <div class="status" id="status" aria-live="polite"></div>
     </section>
 
@@ -299,6 +335,7 @@
       const rowsEl = document.getElementById("rows");
       const emptyEl = document.getElementById("emptyState");
       const grandTotalEl = document.getElementById("grandTotal");
+      const grandTotalTopEl = document.getElementById("grandTotalTop");
       const statusEl = document.getElementById("status");
 
       const addRowBtn = document.getElementById("addRowBtn");
@@ -452,10 +489,12 @@
           qtyInput.type = "number";
           qtyInput.min = "0";
           qtyInput.step = "1";
-          qtyInput.value = String(clampInt(row.qty));
+
+          const qtyVal = clampInt(row.qty);
+          qtyInput.value = (qtyVal === 0) ? "" : String(qtyVal);
+
           qtyInput.setAttribute("aria-label", "Menge");
 
-          /* Änderung 1/2: Variante A – wenn Wert 0 ist, beim Fokus direkt markieren */
           qtyInput.addEventListener("focus", () => {
             if (String(qtyInput.value) === "0") {
               try{ qtyInput.select(); } catch(_){}
@@ -463,6 +502,13 @@
           });
 
           qtyInput.addEventListener("input", () => {
+            if (qtyInput.value === "") {
+              state.rows[idx].qty = 0;
+              updateRowSum(idx, rowEl);
+              updateGrandTotal();
+              scheduleAutoSave();
+              return;
+            }
             const q = clampInt(qtyInput.value);
             qtyInput.value = String(q);
             state.rows[idx].qty = q;
@@ -470,6 +516,7 @@
             updateGrandTotal();
             scheduleAutoSave();
           });
+
           qtyCell.appendChild(qtyInput);
 
           const sumCell = document.createElement("div");
@@ -583,7 +630,9 @@
 
       function updateGrandTotal(){
         const totalCents = computeGrandTotalCents(state);
-        grandTotalEl.textContent = formatMoneyValue(centsToMoney(totalCents)) + "\u00A0€";
+        const txt = formatMoneyValue(centsToMoney(totalCents)) + "\u00A0€";
+        grandTotalEl.textContent = txt;
+        grandTotalTopEl.textContent = txt;
       }
 
       function serializeState(){
@@ -691,8 +740,6 @@
   </script>
 </body>
 </html>
-
-
    
 
   
