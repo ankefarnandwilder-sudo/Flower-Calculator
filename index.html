@@ -6,13 +6,15 @@
   <title>Preisrechner offline</title>
   <style>
     :root{
-      --sage: #6f8f7b;
-      --sand: #8a7763;
+      /* heller, skandinavischer innerhalb derselben Farbwelt */
+      --sage: #8fb3a0;
+      --sand: #a79380;
       --white: #ffffff;
-      --gray: #f3f4f4;
+      --gray: #f6f7f7;
+
       --radius: 12px;
-      --border: 1px solid rgba(138, 119, 99, 0.35);
-      --border-strong: 1px solid rgba(138, 119, 99, 0.7);
+      --border: 1px solid rgba(167, 147, 128, 0.32);
+      --border-strong: 1px solid rgba(167, 147, 128, 0.58);
       --pad: 12px;
     }
 
@@ -50,7 +52,7 @@
     .sub{
       margin: 6px 0 0;
       font-size: 12px;
-      color: rgba(138, 119, 99, 0.85);
+      color: rgba(167, 147, 128, 0.88);
     }
 
     .panel{
@@ -88,20 +90,20 @@
 
     .btn.primary{
       background: var(--sage);
-      border: 1px solid rgba(111, 143, 123, 0.75);
+      border: 1px solid rgba(143, 179, 160, 0.75);
       color: var(--white);
     }
 
     .btn.secondary{
       background: var(--sand);
-      border: 1px solid rgba(138, 119, 99, 0.75);
+      border: 1px solid rgba(167, 147, 128, 0.75);
       color: var(--white);
     }
 
     .status{
       margin-top: 10px;
       font-size: 12px;
-      color: rgba(138, 119, 99, 0.85);
+      color: rgba(167, 147, 128, 0.88);
       min-height: 16px;
     }
 
@@ -126,11 +128,11 @@
       border-bottom: var(--border);
       font-size: 12px;
       font-weight: 700;
-      color: rgba(138, 119, 99, 0.9);
+      color: rgba(167, 147, 128, 0.92);
     }
 
     .row{
-      border-bottom: 1px solid rgba(138, 119, 99, 0.22);
+      border-bottom: 1px solid rgba(167, 147, 128, 0.18);
       background: var(--white);
     }
     .row:last-child{ border-bottom: none; }
@@ -151,7 +153,7 @@
       outline: none;
     }
     input[type="text"]:focus, input[type="number"]:focus{
-      border: 1px solid rgba(111, 143, 123, 0.85);
+      border: 1px solid rgba(143, 179, 160, 0.9);
     }
 
     input[type="number"]{
@@ -192,10 +194,10 @@
       justify-content: center;
       cursor: pointer;
       padding: 0;
-      color: rgba(138, 119, 99, 0.9);
+      color: rgba(167, 147, 128, 0.9);
       -webkit-tap-highlight-color: transparent;
     }
-    .iconbtn:focus{ outline: none; border: 1px solid rgba(111, 143, 123, 0.85); }
+    .iconbtn:focus{ outline: none; border: 1px solid rgba(143, 179, 160, 0.9); }
     .iconbtn:active{ transform: translateY(0.5px); }
 
     .iconbtn svg{
@@ -220,7 +222,7 @@
     .total-label{
       font-size: 14px;
       font-weight: 700;
-      color: rgba(138, 119, 99, 0.92);
+      color: rgba(167, 147, 128, 0.92);
       white-space: nowrap;
     }
 
@@ -237,7 +239,7 @@
       border-top: var(--border);
       background: var(--white);
       font-size: 13px;
-      color: rgba(138, 119, 99, 0.85);
+      color: rgba(167, 147, 128, 0.88);
     }
 
     @media (max-width: 520px){
@@ -452,6 +454,14 @@
           qtyInput.step = "1";
           qtyInput.value = String(clampInt(row.qty));
           qtyInput.setAttribute("aria-label", "Menge");
+
+          /* Änderung 1/2: Variante A – wenn Wert 0 ist, beim Fokus direkt markieren */
+          qtyInput.addEventListener("focus", () => {
+            if (String(qtyInput.value) === "0") {
+              try{ qtyInput.select(); } catch(_){}
+            }
+          });
+
           qtyInput.addEventListener("input", () => {
             const q = clampInt(qtyInput.value);
             qtyInput.value = String(q);
@@ -682,10 +692,16 @@
 </body>
 </html>
 
+
+   
+
+  
+ 
+   
+
  
 
-
-
+  
 
   
 
